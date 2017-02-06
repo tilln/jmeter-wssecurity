@@ -6,6 +6,6 @@ deploy:
   provider: releases
   api_key:
     secure: XRKnP/Pqj7nVUXSzEQqgYmaK63S0La4AM7FneUeApzGaOK5ggK+tk0K5xAqn0zdy9wMZf9gwAZm9qFLsjk6FTnAGGK1IX5KJeljirEQAEbT2uSgMZAOz78F3ODflnbWPK1YeH8ntrfVAA6Opyxqt9To940geFt70bt1GS/8qey7Jn+j8DUKAR9JR4tzPPBFmfqcoI5hN28Q5otI7ztgxrVpsaBtF67Nn8EivdKQgfyXAv9NT0efgjfYo9NYbizsCZ+tXqBkxZ8aIKS0HvvAA5sNhEXLcsRfEh9oFSKnx1Mi3qpR3J64HBOt+SgBaYcp93GxBx8D33zU7rzBs5YWQ+NLSXjWgJVdsqaygcVTZttj7lwDGNvcyl3dsWn9V9M7lhs5sTd1FpqA2R2aHtgD622YQO3j+Oc2dHmu4cj4I/nbXutCRoiuZjsGPsCUv3KxHUKhY0DSU8KOKQ3VjksqUnYRPmpAKmrcFVdMUskKH80oy2RfUZyQFjl4aDAf8SBukWu91zMk0u0ojpJtrlaOdAiqCDUrlpQSIyt0ByvqBgBQhTM+ZIs7qT8IEHaYz93C/EBYox6tmNtPAa67wszz2G0XRqYWfIafASu+OQxjlfdFwP+E4fFy4XGWfF3oIDFkiX1utKgCSYnosiuAYeRYfSO8FloomHCCwZYiTXTRLW7w=
-  file: target/jmeter-wss-preprocessor-1.0-SNAPSHOT.jar
+  file: target/jmeter-wssecurity-1.0-SNAPSHOT.jar
   on:
-    repo: tilln/jmeter-wss-preprocessor
+    repo: tilln/jmeter-wssecurity

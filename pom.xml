@@ -2,10 +2,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>co.nz.breakpoint.jmeter.modifiers</groupId>
-	<artifactId>jmeter-wss-preprocessor</artifactId>
+	<artifactId>jmeter-wssecurity</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>jmeter-wss-preprocessor</name>
+	<name>jmeter-wssecurity</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -13,9 +13,9 @@
 	</properties>
 
 	<scm>
-		<url>https://github.com/tilln/jmeter-wss-preprocessor</url>
-		<connection>scm:git:git://github.com/tilln/jmeter-wss-preprocessor</connection>
-		<developerConnection>scm:git:git@github.com:tilln/jmeter-wss-preprocessor.git</developerConnection>
+		<url>https://github.com/tilln/jmeter-wssecurity</url>
+		<connection>scm:git:git://github.com/tilln/jmeter-wssecurity</connection>
+		<developerConnection>scm:git:git@github.com:tilln/jmeter-wssecurity.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
