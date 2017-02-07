@@ -41,7 +41,9 @@ public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor {
 
 	@Override
 	protected Document build(Document document, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException {
-		return ((WSSecEncrypt)secBuilder).build(document, crypto, secHeader);
+		document = ((WSSecEncrypt)secBuilder).build(document, crypto, secHeader);
+		secBuilder = new WSSecEncrypt(); // discard old instance and create a fresh one for next iteration
+		return document;
 	}
 	
 	// Accessors

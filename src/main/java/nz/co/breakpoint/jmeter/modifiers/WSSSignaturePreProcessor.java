@@ -52,7 +52,9 @@ public class WSSSignaturePreProcessor extends AbstractWSSecurityPreProcessor {
 	
 	@Override
 	protected Document build(Document document, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException {
-		return ((WSSecSignature)secBuilder).build(document, crypto, secHeader);
+		document = ((WSSecSignature)secBuilder).build(document, crypto, secHeader);
+		secBuilder = new WSSecSignature(); // discard old instance and create a fresh one for next iteration
+		return document;
 	}
 	
 	// Accessors
