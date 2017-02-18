@@ -1,11 +1,9 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.processor.PreProcessor;
-import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.samplers.Sampler;
-import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
-import org.apache.jmeter.protocol.jms.sampler.JMSSampler;
+import org.apache.jmeter.testbeans.TestBean;
+import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 import java.io.ByteArrayInputStream;
@@ -36,10 +34,8 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 	private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	static { factory.setNamespaceAware(true); }
 	
-	private final DocumentBuilder docBuilder; // Handles the XML document
+	transient private final DocumentBuilder docBuilder; // Handles the XML document
 
-	protected WSSecBase secBuilder; // Subclasses are to instantiate an appropriate instance
-	
 	private final Properties cryptoProps; // Holds configured attributes for crypto instance
 	
 	private String certAlias, certPassword; // Certificate alias and password (if private cert)
@@ -68,41 +64,21 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 		return getThreadContext().getCurrentSampler();
 	}
 	
-	/* The JMeter API lacks an interface for samplers that have a content or payload,
-	 * so we have to use class specific methods.
-	 */
-	protected String getSamplerContent() {
-		Sampler sampler = getSampler();
+	protected String getSamplerPayload() {
+		return SamplerPayloadAccessor.getPayload(getSampler());
+	}
+	
+	protected void setSamplerPayload(String payload) {
+		SamplerPayloadAccessor.setPayload(getSampler(), payload);
+	}
 
-		if (sampler instanceof HTTPSamplerBase) {
-			HTTPSamplerBase httpSampler = ((HTTPSamplerBase)sampler);
-			if (!httpSampler.getPostBodyRaw()) {
-				log.error("Raw post body required.");
-				return null; 
-			}
-			return httpSampler.getArguments().getArgument(0).getValue(); 
-		}
-		else if (sampler instanceof JMSSampler) {
-			return ((JMSSampler)sampler).getContent();
-		}
-		log.warn("Cannot get sampler content of "+sampler.getName());
-		return null;
-	}
-	
-	protected void setSamplerContent(String content) {
-		Sampler sampler = getSampler();
-				
-		if (sampler instanceof HTTPSamplerBase) {
-			((HTTPSamplerBase)sampler).getArguments().getArgument(0).setValue(content);
-		}
-		else if (sampler instanceof JMSSampler) {
-			((JMSSampler)sampler).setContent(content);
-		}
-		else {
-			log.warn("Cannot set sampler content of "+sampler.getName());
-		}
-	}
-	
+	protected abstract WSSecBase getSecBuilder(); // Subclasses are to instantiate an appropriate instance
+
+	// Subclasses are to implement the actual creation of the signature or encryption,
+	// as WSSecBase does not define a build method.
+	protected abstract Document build(Document document, Crypto crypto, WSSecHeader secHeader)
+		throws WSSecurityException;
+
 	/* The main method that is called before the sampler.
 	 * This will get, parse, secure (sign or encrypt) and then replace 
 	 * the sampler's payload.
@@ -111,7 +87,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 	 */
 	@Override
 	public void process() {
-		String xml = getSamplerContent();
+		String xml = getSamplerPayload();
 		if (xml == null) return;
 
 		try {
@@ -124,18 +100,13 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 
 			doc = this.build(doc, crypto, secHeader); // Delegate in abstract method
 
-			setSamplerContent(XMLUtils.prettyDocumentToString(doc));
+			setSamplerPayload(XMLUtils.prettyDocumentToString(doc));
 		}
 		catch (Exception e) { 
 			log.error(e.toString());
 		}
 	}
-	
-	// Subclasses are to implement the actual creation of the signature or encryption, 
-	// as WSSecBase does not define a build method.
-	protected abstract Document build(Document document, Crypto crypto, WSSecHeader secHeader) 
-		throws WSSecurityException;
-	
+
 	// Accessors
 	public String getKeystoreFile() {
 		return cryptoProps.getProperty(PREFIX+KEYSTORE_FILE); 
@@ -158,7 +129,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 	}
 
 	public void setCertAlias(String certAlias) {
-		secBuilder.setUserInfo(this.certAlias = certAlias, certPassword); 
+		getSecBuilder().setUserInfo(this.certAlias = certAlias, certPassword);
 	}
 
 	public String getCertPassword() {
@@ -166,15 +137,15 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 	}
 
 	public void setCertPassword(String certPassword) {
-		secBuilder.setUserInfo(certAlias, this.certPassword = certPassword); 
+		getSecBuilder().setUserInfo(certAlias, this.certPassword = certPassword);
 	}
 	
 	public String getKeyIdentifier() {
-		return getKeyIdentifierLabelForType(secBuilder.getKeyIdentifierType());
+		return getKeyIdentifierLabelForType(getSecBuilder().getKeyIdentifierType());
 	}
 
 	public void setKeyIdentifier(String keyIdentifier) {
-		secBuilder.setKeyIdentifierType(keyIdentifiers.get(keyIdentifier));
+		getSecBuilder().setKeyIdentifierType(keyIdentifiers.get(keyIdentifier));
 	}
 
 	public List<SecurityPart> getPartsToSecure() {
@@ -183,9 +154,9 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 	
 	public void setPartsToSecure(List<SecurityPart> partsToSecure) {
 		this.partsToSecure = partsToSecure;
-		secBuilder.getParts().clear();
+		getSecBuilder().getParts().clear();
 		for (SecurityPart part : partsToSecure) {
-			secBuilder.getParts().add(part.getPart());
+			getSecBuilder().getParts().add(part.getPart());
 		}
 	}	
 }

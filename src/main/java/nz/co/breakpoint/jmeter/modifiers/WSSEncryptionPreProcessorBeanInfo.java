@@ -10,7 +10,7 @@ public class WSSEncryptionPreProcessorBeanInfo extends AbstractWSSecurityPreProc
 		
 		createPropertyGroup("Encryption", new String[]{ 
 			"keyIdentifier", "symmetricEncryptionAlgorithm", "keyEncryptionAlgorithm", "createEncryptedKey",
-			getPartsToSecurePropertyName()
+			PARTSTOSECURE // this property is created in the parent class but added here so it is rendered at the bottom
 		});
 		PropertyDescriptor p;
 

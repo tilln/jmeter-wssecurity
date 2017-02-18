@@ -35,12 +35,20 @@ Users familiar with SoapUI will find similarities to the [outgoing WS-Security c
 
 ![SOAP Message Encrypter](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/encryption.png)
 
+### Configuration
 
-Dependencies
-------------
+The dropdown fields are initialized with WSS default values, and allow the customization of most signature and encryption settings, 
+depending on what the endpoint's WSDL defines.
 
-Maven retrieves the following dependencies:
+The "Parts to Sign"/"Parts to Encrypt" are empty by default, however, that results in the SOAP Body element to be signed or encrypted.
 
-* org.apache.wss4j / wss4j-ws-security-dom
-* org.apache.wss4j / wss4j-ws-security-common
-* org.apache.santuario / xmlsec
+Suppose the Timestamp element was to be included in the signature or encryption in addition to the Body element, both would have to be listed as follows: 
+
+|Name|Namespace|Encode|
+|----|---------|------|
+|Body|http://schemas.xmlsoap.org/soap/envelope/| |
+|Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd| |
+
+Note that the Preprocessor does not generate the Timestamp element but it needs to be present in the payload.
+
+Encode is only relevant for encryption and can be "Content" (default) or "Element". 
