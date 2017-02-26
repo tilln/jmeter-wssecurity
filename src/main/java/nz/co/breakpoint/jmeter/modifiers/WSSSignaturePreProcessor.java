@@ -1,6 +1,5 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -18,14 +17,18 @@ public class WSSSignaturePreProcessor extends AbstractWSSecurityPreProcessor {
 
 	transient private WSSecSignature secBuilder = new WSSecSignature();
 
-	static {
-		keyIdentifiers.put("Binary Security Token",         WSConstants.BST_DIRECT_REFERENCE);
-		keyIdentifiers.put("Issuer Name and Serial Number", WSConstants.ISSUER_SERIAL);
-		keyIdentifiers.put("X509 Certificate",              WSConstants.X509_KEY_IDENTIFIER);
-		keyIdentifiers.put("Subject Key Identifier",        WSConstants.SKI_KEY_IDENTIFIER);
-		keyIdentifiers.put("Thumbprint SHA1 Identifier",    WSConstants.THUMBPRINT_IDENTIFIER);
-	}
-	
+	/* Currently supported attributes are listed below.
+	 * The first value for each will be displayed in the GUI as default.
+	 */
+	static final String[] keyIdentifiers = new String[]{
+		getKeyIdentifierLabelForType(WSConstants.BST_DIRECT_REFERENCE),
+		getKeyIdentifierLabelForType(WSConstants.ISSUER_SERIAL),
+		getKeyIdentifierLabelForType(WSConstants.X509_KEY_IDENTIFIER),
+		getKeyIdentifierLabelForType(WSConstants.SKI_KEY_IDENTIFIER),
+		getKeyIdentifierLabelForType(WSConstants.THUMBPRINT_IDENTIFIER),
+		getKeyIdentifierLabelForType(WSConstants.KEY_VALUE),
+	};
+
 	static final String[] signatureCanonicalizations = new String[]{
 		WSConstants.C14N_EXCL_OMIT_COMMENTS, WSConstants.C14N_EXCL_WITH_COMMENTS,
 		WSConstants.C14N_OMIT_COMMENTS,      WSConstants.C14N_WITH_COMMENTS,
@@ -33,21 +36,19 @@ public class WSSSignaturePreProcessor extends AbstractWSSecurityPreProcessor {
 
 	static final String[] signatureAlgorithms = new String[]{
 		XMLSignature.ALGO_ID_SIGNATURE_RSA,           XMLSignature.ALGO_ID_SIGNATURE_DSA,
-		XMLSignature.ALGO_ID_MAC_HMAC_SHA1,           XMLSignature.ALGO_ID_MAC_HMAC_SHA256,
-		XMLSignature.ALGO_ID_MAC_HMAC_SHA384,         XMLSignature.ALGO_ID_MAC_HMAC_SHA512,
-		XMLSignature.ALGO_ID_MAC_HMAC_RIPEMD160,      XMLSignature.ALGO_ID_MAC_HMAC_NOT_RECOMMENDED_MD5,
-		XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA1,    XMLSignature.ALGO_ID_SIGNATURE_NOT_RECOMMENDED_RSA_MD5,
+		XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA1,    XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA256,
+		XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA384,  XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA512,
 		XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1,      XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256,
 		XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384,    XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512,
 		XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160,
 	};
-	
+
 	static final String[] digestAlgorithms = new String[]{
 		MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1,      MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA256,
 		MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA384,    MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA512,
-		MessageDigestAlgorithm.ALGO_ID_DIGEST_RIPEMD160, MessageDigestAlgorithm.ALGO_ID_DIGEST_NOT_RECOMMENDED_MD5,
+		MessageDigestAlgorithm.ALGO_ID_DIGEST_RIPEMD160,
 	};
-	
+
 	public WSSSignaturePreProcessor() throws ParserConfigurationException {
 		super();
 	}
@@ -88,7 +89,7 @@ public class WSSSignaturePreProcessor extends AbstractWSSecurityPreProcessor {
 	public void setDigestAlgorithm(String digestAlgorithm) {
 		secBuilder.setDigestAlgo(digestAlgorithm);
 	}
-	
+
 	public boolean getUseSingleCertificate() {
 		return secBuilder.isUseSingleCertificate();
 	}

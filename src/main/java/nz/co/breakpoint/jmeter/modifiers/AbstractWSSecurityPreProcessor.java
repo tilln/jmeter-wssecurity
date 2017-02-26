@@ -20,6 +20,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecBase;
+import org.apache.wss4j.dom.WSConstants;
 import org.w3c.dom.Document;
 
 import static org.apache.wss4j.common.crypto.Merlin.PREFIX;
@@ -33,16 +34,27 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 
 	private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	static { factory.setNamespaceAware(true); }
-	
+
 	transient private final DocumentBuilder docBuilder; // Handles the XML document
 
 	private final Properties cryptoProps; // Holds configured attributes for crypto instance
-	
+
 	private String certAlias, certPassword; // Certificate alias and password (if private cert)
-	
-	static final Map<String, Integer> keyIdentifiers = new HashMap<String, Integer>(); // Subclasses are to populate an appropriate set
-	
+
 	private List<SecurityPart> partsToSecure; // Holds the names of XML elements to secure (e.g. SOAP Body)
+
+	static final Map<String, Integer> keyIdentifierMap = new HashMap<String, Integer>();
+	static {
+		keyIdentifierMap.put("Binary Security Token",         WSConstants.BST_DIRECT_REFERENCE);
+		keyIdentifierMap.put("Issuer Name and Serial Number", WSConstants.ISSUER_SERIAL);
+		keyIdentifierMap.put("X509 Certificate",              WSConstants.X509_KEY_IDENTIFIER);
+		keyIdentifierMap.put("Subject Key Identifier",        WSConstants.SKI_KEY_IDENTIFIER);
+		keyIdentifierMap.put("Thumbprint SHA1 Identifier",    WSConstants.THUMBPRINT_IDENTIFIER);
+		keyIdentifierMap.put("Encrypted Key SHA1",            WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER); // only for encryption (symmetric signature not implemented yet - would require UI fields for setSecretKey or setEncrKeySha1value)
+		keyIdentifierMap.put("Custom Key Identifier",         WSConstants.CUSTOM_KEY_IDENTIFIER); // not implemented yet (requires UI fields for setCustomTokenId and setCustomTokenValueType)
+		keyIdentifierMap.put("Key Value",                     WSConstants.KEY_VALUE); // only for signature
+		keyIdentifierMap.put("Endpoint Key Identifier",       WSConstants.ENDPOINT_KEY_IDENTIFIER); // not supported by Merlin https://ws.apache.org/wss4j/apidocs/org/apache/wss4j/common/crypto/Merlin.html#getX509Certificates-org.apache.wss4j.common.crypto.CryptoType-
+	}
 
 	public AbstractWSSecurityPreProcessor() throws ParserConfigurationException {
 		super();
@@ -51,23 +63,23 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 		cryptoProps.setProperty("org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin");
 		cryptoProps.setProperty(PREFIX+KEYSTORE_TYPE, "jks");
 	}
-	
-	static String getKeyIdentifierLabelForType(int keyIdentifierType) {
-		for (Map.Entry<String, Integer> id : keyIdentifiers.entrySet()) {
+
+	protected static String getKeyIdentifierLabelForType(int keyIdentifierType) {
+		for (Map.Entry<String, Integer> id : keyIdentifierMap.entrySet()) {
 			if (id.getValue() == keyIdentifierType)
 				return id.getKey();
 		}
 		return null;
 	}
-	
+
 	protected Sampler getSampler() {
 		return getThreadContext().getCurrentSampler();
 	}
-	
+
 	protected String getSamplerPayload() {
 		return SamplerPayloadAccessor.getPayload(getSampler());
 	}
-	
+
 	protected void setSamplerPayload(String payload) {
 		SamplerPayloadAccessor.setPayload(getSampler(), payload);
 	}
@@ -92,7 +104,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 
 		try {
 			Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
-		
+
 			WSSecHeader secHeader = new WSSecHeader(doc);
 			secHeader.insertSecurityHeader();
 
@@ -145,13 +157,13 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 	}
 
 	public void setKeyIdentifier(String keyIdentifier) {
-		getSecBuilder().setKeyIdentifierType(keyIdentifiers.get(keyIdentifier));
+		getSecBuilder().setKeyIdentifierType(keyIdentifierMap.get(keyIdentifier));
 	}
 
 	public List<SecurityPart> getPartsToSecure() {
 		return partsToSecure;
 	}
-	
+
 	public void setPartsToSecure(List<SecurityPart> partsToSecure) {
 		this.partsToSecure = partsToSecure;
 		getSecBuilder().getParts().clear();

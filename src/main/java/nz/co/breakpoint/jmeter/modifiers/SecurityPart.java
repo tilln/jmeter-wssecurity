@@ -30,6 +30,8 @@ public class SecurityPart extends AbstractTestElement {
 	/* Convenience method for Preprocessor accessor
 	 */
 	public WSEncryptionPart getPart() {
-		return new WSEncryptionPart(getName(), getNamespace(), getModifier());
+		WSEncryptionPart part = new WSEncryptionPart(getName(), getNamespace(), getModifier());
+		part.setRequired(false); // treat as optional
+		return part;
 	}
 }

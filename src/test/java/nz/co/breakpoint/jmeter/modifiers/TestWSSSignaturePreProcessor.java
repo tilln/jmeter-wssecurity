@@ -25,7 +25,35 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
 		HTTPSamplerBase sampler = createHTTPSampler();
 		context.setCurrentSampler(sampler);
 		mod.process();
-		String signedContent = sampler.getArguments().getArgument(0).getValue();
+		String signedContent = SamplerPayloadAccessor.getPayload(sampler);
 		assertThat(signedContent, containsString("\"http://www.w3.org/2000/09/xmldsig#\""));
+	}
+
+	@Test
+	public void testAllSignatureCombinations() throws Exception {
+		for (String ki : WSSSignaturePreProcessor.keyIdentifiers) {
+			for (String sc : WSSSignaturePreProcessor.signatureCanonicalizations) {
+				for (String sa : WSSSignaturePreProcessor.signatureAlgorithms) {
+					for (String da : WSSSignaturePreProcessor.digestAlgorithms) {
+						for (boolean us : new boolean[]{true, false}) {
+							initCertSettings(mod, sa);
+							mod.setKeyIdentifier(ki);
+							mod.setSignatureCanonicalization(sc);
+							mod.setSignatureAlgorithm(sa);
+							mod.setDigestAlgorithm(da);
+							mod.setUseSingleCertificate(us);
+							HTTPSamplerBase sampler = createHTTPSampler();
+							context.setCurrentSampler(sampler);
+							mod.process();
+							String signedContent = SamplerPayloadAccessor.getPayload(sampler);
+							assertThat(signedContent, containsString("\"http://www.w3.org/2000/09/xmldsig#\""));
+							assertThat(signedContent, containsString(sc));
+							assertThat(signedContent, containsString(sa));
+							assertThat(signedContent, containsString(da));
+						}
+					}
+				}
+			}
+		}
 	}
 }

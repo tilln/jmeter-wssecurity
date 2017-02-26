@@ -1,6 +1,5 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -16,18 +15,22 @@ public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor {
 
 	transient private WSSecEncrypt secBuilder = new WSSecEncrypt();
 
-	static {
-		keyIdentifiers.put("Binary Security Token",         WSConstants.BST_DIRECT_REFERENCE);
-		keyIdentifiers.put("Issuer Name and Serial Number", WSConstants.ISSUER_SERIAL);
-		keyIdentifiers.put("X509 Certificate",              WSConstants.X509_KEY_IDENTIFIER);
-		keyIdentifiers.put("Subject Key Identifier",        WSConstants.SKI_KEY_IDENTIFIER);
-		keyIdentifiers.put("Thumbprint SHA1 Identifier",    WSConstants.THUMBPRINT_IDENTIFIER);
-		keyIdentifiers.put("EncryptedKeySHA1",              WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-	}
-	
+	/* Currently supported attributes are listed below.
+	 * The first value for each will be displayed in the GUI as default.
+	 */
+	static final String[] keyIdentifiers = new String[]{
+		getKeyIdentifierLabelForType(WSConstants.BST_DIRECT_REFERENCE),
+		getKeyIdentifierLabelForType(WSConstants.ISSUER_SERIAL),
+		getKeyIdentifierLabelForType(WSConstants.X509_KEY_IDENTIFIER),
+		getKeyIdentifierLabelForType(WSConstants.SKI_KEY_IDENTIFIER),
+		getKeyIdentifierLabelForType(WSConstants.THUMBPRINT_IDENTIFIER),
+		getKeyIdentifierLabelForType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER),
+	};
+
 	static final String[] keyEncryptionAlgorithms = new String[]{
 		WSConstants.KEYTRANSPORT_RSAOEP,
 		WSConstants.KEYTRANSPORT_RSA15,
+		WSConstants.KEYTRANSPORT_RSAOAEP_XENC11,
 	};
 
 	static final String[] symmetricEncryptionAlgorithms = new String[]{
@@ -52,7 +55,7 @@ public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor {
 		secBuilder = new WSSecEncrypt(); // discard old instance and create a fresh one for next iteration, during which the bean properties will be reapplied before processing the sampler
 		return document;
 	}
-	
+
 	// Accessors
 	public String getSymmetricEncryptionAlgorithm() {
 		return secBuilder.getSymmetricEncAlgorithm();
@@ -69,7 +72,7 @@ public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor {
 	public void setKeyEncryptionAlgorithm(String algorithm) {
 		secBuilder.setKeyEncAlgo(algorithm);
 	}
-	
+
 	public boolean getCreateEncryptedKey() {
 		return secBuilder.isEncryptSymmKey();
 	}

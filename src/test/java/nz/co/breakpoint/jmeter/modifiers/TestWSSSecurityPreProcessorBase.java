@@ -26,17 +26,24 @@ public class TestWSSSecurityPreProcessorBase {
         +   "</SOAP-ENV:Body>" 
         + "</SOAP-ENV:Envelope>";	
 
-	HTTPSamplerBase createHTTPSampler() {
+	static HTTPSamplerBase createHTTPSampler() {
 		HTTPSamplerBase sampler = HTTPSamplerFactory.newInstance();
 		sampler.addNonEncodedArgument("", SAMPLE_SOAP_MSG, "");
 		sampler.setPostBodyRaw(true);
 		return sampler;
 	}
 	
-	void initCertSettings(AbstractWSSecurityPreProcessor mod) {
-		mod.setKeystoreFile("src/test/resources/wss40.jks");
-		mod.setKeystorePassword("security");
-		mod.setCertAlias("wss40");
-		mod.setCertPassword("security");
+	static void initCertSettings(AbstractWSSecurityPreProcessor mod) {
+		initCertSettings(mod, WSSSignaturePreProcessor.signatureAlgorithms[0]);
+	}
+
+	static void initCertSettings(AbstractWSSecurityPreProcessor mod, String signatureAlgorithm) {
+		mod.setKeystoreFile("src/test/resources/keystore.jks");
+		mod.setKeystorePassword("changeit");
+		mod.setCertAlias(
+			signatureAlgorithm.startsWith("http://www.w3.org/2000/09/xmldsig#dsa") ? "dsa" :
+			signatureAlgorithm.startsWith("http://www.w3.org/2001/04/xmldsig-more#ecdsa") ? "ec" :
+			"rsa");
+		mod.setCertPassword("changeit");
 	}
 }

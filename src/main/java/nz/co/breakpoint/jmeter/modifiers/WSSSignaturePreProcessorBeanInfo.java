@@ -16,25 +16,28 @@ public class WSSSignaturePreProcessorBeanInfo extends AbstractWSSecurityPreProce
 
 		p = property("keyIdentifier");
 		p.setValue(NOT_UNDEFINED, Boolean.TRUE);
-		p.setValue(DEFAULT, WSSSignaturePreProcessor.getKeyIdentifierLabelForType(WSConstants.BST_DIRECT_REFERENCE));
+		p.setValue(DEFAULT, WSSSignaturePreProcessor.keyIdentifiers[0]);
 		p.setValue(NOT_OTHER, Boolean.TRUE);
-		p.setValue(TAGS, WSSSignaturePreProcessor.keyIdentifiers.keySet().toArray(new String[]{}));
+		p.setValue(TAGS, WSSSignaturePreProcessor.keyIdentifiers);
 
 		p = property("signatureAlgorithm");
 		p.setValue(NOT_UNDEFINED, Boolean.TRUE);
 		p.setValue(DEFAULT, WSSSignaturePreProcessor.signatureAlgorithms[0]);
+		p.setValue(DEFAULT_NOT_SAVED, Boolean.TRUE);
 		p.setValue(NOT_OTHER, Boolean.TRUE);
 		p.setValue(TAGS, WSSSignaturePreProcessor.signatureAlgorithms);
 
 		p = property("signatureCanonicalization");
 		p.setValue(NOT_UNDEFINED, Boolean.TRUE);
 		p.setValue(DEFAULT, WSSSignaturePreProcessor.signatureCanonicalizations[0]);
+		p.setValue(DEFAULT_NOT_SAVED, Boolean.TRUE);
 		p.setValue(NOT_OTHER, Boolean.TRUE);
 		p.setValue(TAGS, WSSSignaturePreProcessor.signatureCanonicalizations);
 
 		p = property("digestAlgorithm");
 		p.setValue(NOT_UNDEFINED, Boolean.TRUE);
 		p.setValue(DEFAULT, WSSSignaturePreProcessor.digestAlgorithms[0]);
+		p.setValue(DEFAULT_NOT_SAVED, Boolean.TRUE);
 		p.setValue(NOT_OTHER, Boolean.TRUE);
 		p.setValue(TAGS, WSSSignaturePreProcessor.digestAlgorithms);
 
