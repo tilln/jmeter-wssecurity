@@ -7,6 +7,7 @@ import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBase {
@@ -29,7 +30,7 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
 		assertThat(signedContent, containsString("\"http://www.w3.org/2000/09/xmldsig#\""));
 	}
 
-	@Test
+	@Test @Ignore("Long running test with lots of log output")
 	public void testAllSignatureCombinations() throws Exception {
 		for (String ki : WSSSignaturePreProcessor.keyIdentifiers) {
 			for (String sc : WSSSignaturePreProcessor.signatureCanonicalizations) {
