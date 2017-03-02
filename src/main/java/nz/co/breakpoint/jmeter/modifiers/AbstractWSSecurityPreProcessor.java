@@ -62,8 +62,11 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 		cryptoProps = new Properties();
 		cryptoProps.setProperty("org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin");
 		cryptoProps.setProperty(PREFIX+KEYSTORE_TYPE, "jks");
+		initSecBuilder();
 	}
 
+	/* Reverse lookup for above keyIdentifierMap. Mainly used for populating the GUI dropdown.
+	 */
 	protected static String getKeyIdentifierLabelForType(int keyIdentifierType) {
 		for (Map.Entry<String, Integer> id : keyIdentifierMap.entrySet()) {
 			if (id.getValue() == keyIdentifierType)
@@ -84,18 +87,22 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 		SamplerPayloadAccessor.setPayload(getSampler(), payload);
 	}
 
-	protected abstract WSSecBase getSecBuilder(); // Subclasses are to instantiate an appropriate instance
+	/* Subclasses are to instantiate and initialize an appropriate instance.
+	 */
+	protected abstract WSSecBase getSecBuilder();
+	protected abstract void initSecBuilder();
 
-	// Subclasses are to implement the actual creation of the signature or encryption,
-	// as WSSecBase does not define a build method.
+	/* Subclasses are to implement the actual creation of the signature or encryption,
+	 * as WSSecBase does not define a build method.
+	 */
 	protected abstract Document build(Document document, Crypto crypto, WSSecHeader secHeader)
 		throws WSSecurityException;
 
 	/* The main method that is called before the sampler.
-	 * This will get, parse, secure (sign or encrypt) and then replace 
+	 * This will get, parse, secure (sign or encrypt) and then replace
 	 * the sampler's payload.
-	 * A new crypto instance needs to be created for every iteration 
-	 * as the config could contain variables which may change. 
+	 * A new crypto instance needs to be created for every iteration
+	 * as the config could contain variables which may change.
 	 */
 	@Override
 	public void process() {
@@ -117,6 +124,14 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 		catch (Exception e) { 
 			log.error(e.toString());
 		}
+		/* There is no cleanup method in the wss4j API, so we have to discard the old instance
+		 * and create a fresh one during the next iteration.
+		 * To do that at the beginning of PreProcessor.process() would be too late as the Bean properties are (re)applied
+		 * immediately before, and passed through to the secBuilder instance.
+		 * (@see https://github.com/apache/jmeter/blob/v3_1/src/core/org/apache/jmeter/threads/JMeterThread.java#L787)
+		 * Therefore the only way to do this is *after* the instance is used.
+		 */
+		initSecBuilder();
 	}
 
 	// Accessors

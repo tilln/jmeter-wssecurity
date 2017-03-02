@@ -13,7 +13,7 @@ public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor {
 
 	private static final long serialVersionUID = 1L;
 
-	transient private WSSecEncrypt secBuilder = new WSSecEncrypt();
+	transient private WSSecEncrypt secBuilder;
 
 	/* Currently supported attributes are listed below.
 	 * The first value for each will be displayed in the GUI as default.
@@ -45,15 +45,18 @@ public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor {
 	}
 
 	@Override
+	protected void initSecBuilder() {
+		secBuilder = new WSSecEncrypt();
+	}
+
+	@Override
 	protected WSSecBase getSecBuilder() {
 		return secBuilder;
 	}
 
 	@Override
 	protected Document build(Document document, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException {
-		document = secBuilder.build(document, crypto, secHeader);
-		secBuilder = new WSSecEncrypt(); // discard old instance and create a fresh one for next iteration, during which the bean properties will be reapplied before processing the sampler
-		return document;
+		return secBuilder.build(document, crypto, secHeader);
 	}
 
 	// Accessors
