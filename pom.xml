@@ -4,7 +4,7 @@
 	<groupId>co.nz.breakpoint.jmeter.modifiers</groupId>
 	<artifactId>jmeter-wssecurity</artifactId>
 	<packaging>jar</packaging>
-	<version>1.1</version>
+	<version>1.2-SNAPSHOT</version>
 	<name>jmeter-wssecurity</name>
 	<url>http://maven.apache.org</url>
 
@@ -83,7 +83,14 @@
 					<finalName>${project.name}-${project.version}</finalName>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>

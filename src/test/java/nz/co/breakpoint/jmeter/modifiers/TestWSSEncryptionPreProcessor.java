@@ -22,7 +22,7 @@ public class TestWSSEncryptionPreProcessor extends TestWSSSecurityPreProcessorBa
 	}
 
 	@Test
-	public void testDefaultEncrypyion() throws Exception {
+	public void testDefaultEncryption() throws Exception {
 		HTTPSamplerBase sampler = createHTTPSampler();
 		context.setCurrentSampler(sampler);
 		mod.process();
@@ -30,7 +30,7 @@ public class TestWSSEncryptionPreProcessor extends TestWSSSecurityPreProcessorBa
 		assertThat(encryptedContent, containsString("Type=\"http://www.w3.org/2001/04/xmlenc#Content\""));
 	}
 
-	@Test @Ignore("Long running test with lots of log output")
+	@Test
 	public void testAllEncryptionCombinations() throws Exception {
 		for (String ki : WSSEncryptionPreProcessor.keyIdentifiers) {
 			for (String ke : WSSEncryptionPreProcessor.keyEncryptionAlgorithms) {
