@@ -8,24 +8,42 @@ Overview
 
 Apache JMeter plugin for signing and encrypting SOAP messages (WS-Security).
 
+The plugin provides two [Preprocessors](http://jmeter.apache.org/usermanual/component_reference.html#preprocessors)
+that can be configured for signing and encrypting the payloads of an HTTP Request or JMS Publisher/Point-to-Point sampler
+with a digital certificate from a given JKS keystore.
+
 Installation
 ------------
+
+### Via [PluginsManager](https://jmeter-plugins.org/wiki/PluginsManager/)
+
+Under tab "Available Plugins", select "WS Security for SOAP", then click "Apply Changes and Restart JMeter".
+
+### Via Package from [JMeter-Plugins.org](https://jmeter-plugins.org/)
+
+Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.1.zip) into JMeter's lib/ext directory, then restart JMeter.
+
+### Via Manual Download
 
 1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.1/jmeter-wssecurity-1.1.jar) into JMeter's lib/ext directory.
 2. Copy the following dependencies into JMeter's lib directory:
 	* [org.apache.wss4j / wss4j-ws-security-dom](http://central.maven.org/maven2/org/apache/wss4j/wss4j-ws-security-dom/2.1.8/wss4j-ws-security-dom-2.1.8.jar)
 	* [org.apache.wss4j / wss4j-ws-security-common](http://central.maven.org/maven2/org/apache/wss4j/wss4j-ws-security-common/2.1.8/wss4j-ws-security-common-2.1.8.jar)
 	* [org.apache.santuario / xmlsec](http://central.maven.org/maven2/org/apache/santuario/xmlsec/2.0.8/xmlsec-2.0.8.jar)
-3. When starting JMeter there will be the following two Preprocessors:
-	* SOAP Message Signer
-	* SOAP Message Encrypter
+3. Restart JMeter.
 
 Usage
 ------------
 
-The plugin provides two [Preprocessors](http://jmeter.apache.org/usermanual/component_reference.html#preprocessors) 
-that can be configured for signing and encrypting the payloads of an [HTTP request](http://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request) 
-or [JMS Publisher](http://jmeter.apache.org/usermanual/component_reference.html#JMS_Publisher)/[Point-to-Point sampler](http://jmeter.apache.org/usermanual/component_reference.html#JMS_Point-to-Point).
+From the context menu, select "Add" / "Pre Processors" / "SOAP Message Signer" or "SOAP Message Encrypter".
+
+The message to be signed or encrypted must be a valid SOAP message and must be in one of the following locations:
+* For [HTTP request](http://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request): Tab "Body Data" (not "Parameters")
+* For [JMS Point-to-Point](http://jmeter.apache.org/usermanual/component_reference.html#JMS_Point-to-Point): Text area "Content"
+* For [JMS Publisher](http://jmeter.apache.org/usermanual/component_reference.html#JMS_Publisher): Text area "Text Message..." with "Message source": Textarea (from files is not supported)
+
+*Note that the plugin does not assist with composing the message nor does it do any XML schema validation.*
+
 Users familiar with SoapUI will find similarities to the [outgoing WS-Security configuration](https://www.soapui.org/soapui-projects/ws-security.html#3-Outgoing-WS-Security-configurations).
 
 ### SOAP Message Signer
@@ -50,7 +68,7 @@ Suppose the Timestamp element was to be included in the signature or encryption 
 |Body|http://schemas.xmlsoap.org/soap/envelope/| |
 |Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd| |
 
-Note that the Preprocessor does not generate the Timestamp element but it needs to be present in the payload.
+*Note that the Timestamp element is not inserted by the Preprocessor but has to be present in the payload.*
 
 Encode is only relevant for encryption and can be one of the following:
 * "Element" (default): The entire XML element is encrypted.
@@ -80,3 +98,16 @@ public class SomeSampler extends AbstractSampler {
 Then the JMeter property should be set like so: `jmeter.wssecurity.samplerPayloadAccessors=some.package.SomeSampler.payload`
 
 More than one of these can be comma separated (if really required).
+
+Troubleshooting
+---------------
+
+The signed or encrypted message payload can be inspected via "View Results Tree".
+
+To avoid common problems, make sure that:
+- Keystore contains an entry for the specified certificate alias,
+- the certificate and signature/encryption algorithms match,
+- the SOAP message is correctly formed and can be parsed,
+etc.
+
+It may be useful to increase the logging level in order to investigate any keystore or encryption related issues.
