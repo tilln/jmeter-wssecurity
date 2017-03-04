@@ -110,4 +110,6 @@ To avoid common problems, make sure that:
 - the SOAP message is correctly formed and can be parsed,
 etc.
 
-It may be useful to increase the logging level in order to investigate any keystore or encryption related issues.
+It may be useful to increase the logging level in order to investigate any keystore or encryption related issues, 
+for example by adding `--loglevel=org.apache.wss4j=DEBUG` to the JMeter command line. 
+
