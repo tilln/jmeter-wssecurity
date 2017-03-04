@@ -105,9 +105,10 @@ Troubleshooting
 The signed or encrypted message payload can be inspected via "View Results Tree".
 
 To avoid common problems, make sure that:
-- Keystore contains an entry for the specified certificate alias,
+- the Keystore contains an entry for the specified certificate alias,
 - the certificate and signature/encryption algorithms match,
 - the SOAP message is correctly formed and can be parsed,
+- [Unlimited Strength JCE](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html) is installed to support all key lengths,
 etc.
 
 It may be useful to increase the logging level in order to investigate any keystore or encryption related issues, 
