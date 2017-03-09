@@ -21,7 +21,7 @@ Under tab "Available Plugins", select "WS Security for SOAP", then click "Apply 
 
 ### Via Package from [JMeter-Plugins.org](https://jmeter-plugins.org/)
 
-Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.1.zip) into JMeter's lib/ext directory, then restart JMeter.
+Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.1.zip) into JMeter's lib directory, then restart JMeter.
 
 ### Via Manual Download
 
