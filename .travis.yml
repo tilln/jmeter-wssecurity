@@ -3,7 +3,7 @@ jdk:
 - oraclejdk7
 - oraclejdk8
 before_install:
-- mvn clean
+- rm -rf target
 deploy:
   provider: releases
   api_key:
