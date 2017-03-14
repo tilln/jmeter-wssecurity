@@ -100,4 +100,15 @@ public class WSSSignaturePreProcessor extends AbstractWSSecurityPreProcessor {
 	public void setUseSingleCertificate(boolean useSingleCertificate) {
 		secBuilder.setUseSingleCertificate(useSingleCertificate);
 	}
+
+	/* This getter/setter pair seems to be required for the bean introspector when building the GUI,
+	 * otherwise the parent class property will be overwritten when building child class GUIs.
+	 */
+	public String getKeyIdentifier() {
+		return super.getKeyIdentifier();
+	}
+
+	public void setKeyIdentifier(String keyIdentifier) {
+		super.setKeyIdentifier(keyIdentifier);
+	}
 }
