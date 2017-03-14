@@ -80,10 +80,12 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 	}
 
 	protected String getSamplerPayload() {
+		log.debug("Getting sampler payload");
 		return SamplerPayloadAccessor.getPayload(getSampler());
 	}
 
 	protected void setSamplerPayload(String payload) {
+		log.debug("Setting sampler payload");
 		SamplerPayloadAccessor.setPayload(getSampler(), payload);
 	}
 
@@ -110,13 +112,17 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 		if (xml == null) return;
 
 		try {
+			log.debug("Parsing xml payload");
 			Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
 
+			log.debug("Initializing WSS header");
 			WSSecHeader secHeader = new WSSecHeader(doc);
 			secHeader.insertSecurityHeader();
 
+			log.debug("Getting crypto instance");
 			Crypto crypto = CryptoFactory.getInstance(cryptoProps);
 
+			log.debug("Building WSS header");
 			doc = this.build(doc, crypto, secHeader); // Delegate in abstract method
 
 			setSamplerPayload(XMLUtils.prettyDocumentToString(doc));
