@@ -65,8 +65,8 @@ Suppose the Timestamp element was to be included in the signature or encryption 
 
 |Name|Namespace|Encode|
 |----|---------|------|
-|Body|http://schemas.xmlsoap.org/soap/envelope/| |
-|Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd| |
+|Body|http://schemas.xmlsoap.org/soap/envelope/ | |
+|Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd | |
 
 *Note that the Timestamp element is not inserted by the Preprocessor but has to be present in the payload.*
 
