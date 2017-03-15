@@ -21,11 +21,11 @@ Under tab "Available Plugins", select "WS Security for SOAP", then click "Apply 
 
 ### Via Package from [JMeter-Plugins.org](https://jmeter-plugins.org/)
 
-Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.1.zip) into JMeter's lib directory, then restart JMeter.
+Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.2.zip) into JMeter's lib directory, then restart JMeter.
 
 ### Via Manual Download
 
-1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.1/jmeter-wssecurity-1.1.jar) into JMeter's lib/ext directory.
+1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.2/jmeter-wssecurity-1.2.jar) into JMeter's lib/ext directory.
 2. Copy the following dependencies into JMeter's lib directory:
 	* [org.apache.wss4j / wss4j-ws-security-dom](http://central.maven.org/maven2/org/apache/wss4j/wss4j-ws-security-dom/2.1.8/wss4j-ws-security-dom-2.1.8.jar)
 	* [org.apache.wss4j / wss4j-ws-security-common](http://central.maven.org/maven2/org/apache/wss4j/wss4j-ws-security-common/2.1.8/wss4j-ws-security-common-2.1.8.jar)
