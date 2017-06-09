@@ -113,7 +113,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 
 		try {
 			log.debug("Parsing xml payload");
-			Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
+			Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
 
 			log.debug("Initializing WSS header");
 			WSSecHeader secHeader = new WSSecHeader(doc);
