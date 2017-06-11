@@ -6,7 +6,7 @@ import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +22,7 @@ import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecBase;
 import org.apache.wss4j.dom.WSConstants;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import static org.apache.wss4j.common.crypto.Merlin.PREFIX;
 import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_FILE;
@@ -113,7 +114,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 
 		try {
 			log.debug("Parsing xml payload");
-			Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
+			Document doc = docBuilder.parse(new InputSource(new StringReader(xml)));
 
 			log.debug("Initializing WSS header");
 			WSSecHeader secHeader = new WSSecHeader(doc);

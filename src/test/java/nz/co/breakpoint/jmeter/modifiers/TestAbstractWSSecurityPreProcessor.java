@@ -1,50 +1,82 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import static org.junit.Assert.assertEquals;
-
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.protocol.jms.sampler.JMSSampler;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecBase;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
 
 public class TestAbstractWSSecurityPreProcessor extends TestWSSSecurityPreProcessorBase {
-	private WSSSignaturePreProcessor mod = null;
+	private DummyWSSecurityPreProcessor instance = null;
+
+	class DummyWSSecurityPreProcessor extends AbstractWSSecurityPreProcessor {
+		public DummyWSSecurityPreProcessor() throws ParserConfigurationException {
+			super();
+		}
+
+		@Override
+		protected WSSecBase getSecBuilder() {
+			return null;
+		}
+
+		@Override
+		protected void initSecBuilder() {
+			// no-op implementation for testing
+		}
+
+		@Override
+		protected Document build(Document document, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException {
+			return document;
+		}
+	}
 
 	@Before
 	public void setUp() throws Exception {
 		context = JMeterContextService.getContext();
-		mod = new WSSSignaturePreProcessor();
-		mod.setThreadContext(context);
-		initCertSettings(mod);
+		instance = new DummyWSSecurityPreProcessor();
+		instance.setThreadContext(context);
 	}
 
 	@Test
 	public void testGetPayloadOfOtherSampler() throws Exception {
 		JMSSampler sampler = new JMSSampler();
-		sampler.setContent(SAMPLE_SOAP_MSG);
-
-		context = JMeterContextService.getContext();
-		mod = new WSSSignaturePreProcessor();
-		mod.setThreadContext(context);
 		context.setCurrentSampler(sampler);
-		
-		String payload = mod.getSamplerPayload(); 
+
+		sampler.setContent(SAMPLE_SOAP_MSG);
+		String payload = instance.getSamplerPayload();
 		assertEquals(SAMPLE_SOAP_MSG, payload);
 	}
 
 	@Test
 	public void testSetPayloadOfOtherSampler() throws Exception {
 		JMSSampler sampler = new JMSSampler();
-
-		context = JMeterContextService.getContext();
-		mod = new WSSSignaturePreProcessor();
-		mod.setThreadContext(context);
 		context.setCurrentSampler(sampler);
-		
-		mod.setSamplerPayload(SAMPLE_SOAP_MSG);
+
+		instance.setSamplerPayload(SAMPLE_SOAP_MSG);
 		String payload = sampler.getContent();
 		assertEquals(SAMPLE_SOAP_MSG, payload);
+	}
+
+	@Test
+	public void testProcess() throws Exception {
+		JMSSampler sampler = new JMSSampler();
+		context.setCurrentSampler(sampler);
+		final String xml = "<x>✓</x>";
+		sampler.setContent(xml);
+
+		instance.process();
+		String payload = sampler.getContent();
+		assertThat(payload, containsString(">✓<"));
+		assertThat(payload, containsString(":Security>"));
 	}
 }
