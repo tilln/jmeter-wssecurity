@@ -77,6 +77,6 @@ public class TestAbstractWSSecurityPreProcessor extends TestWSSSecurityPreProces
 		instance.process();
 		String payload = sampler.getContent();
 		assertThat(payload, containsString(">✓<"));
-		assertThat(payload, containsString(":Security>"));
+		assertThat(payload, containsString(":Security"));
 	}
 }
