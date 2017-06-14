@@ -33,11 +33,11 @@ public class TestWSSSecurityPreProcessorBase {
 		return sampler;
 	}
 	
-	static void initCertSettings(AbstractWSSecurityPreProcessor mod) {
+	static void initCertSettings(CryptoWSSecurityPreProcessor mod) {
 		initCertSettings(mod, WSSSignaturePreProcessor.signatureAlgorithms[0]);
 	}
 
-	static void initCertSettings(AbstractWSSecurityPreProcessor mod, String signatureAlgorithm) {
+	static void initCertSettings(CryptoWSSecurityPreProcessor mod, String signatureAlgorithm) {
 		mod.setKeystoreFile("src/test/resources/keystore.jks");
 		mod.setKeystorePassword("changeit");
 		mod.setCertAlias(

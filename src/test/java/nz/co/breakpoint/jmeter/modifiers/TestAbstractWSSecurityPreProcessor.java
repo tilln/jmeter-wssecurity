@@ -5,7 +5,6 @@ import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.protocol.jms.sampler.JMSSampler;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecBase;
@@ -35,7 +34,7 @@ public class TestAbstractWSSecurityPreProcessor extends TestWSSSecurityPreProces
 		}
 
 		@Override
-		protected Document build(Document document, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException {
+		protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
 			return document;
 		}
 	}

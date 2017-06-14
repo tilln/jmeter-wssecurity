@@ -11,7 +11,7 @@ import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
 import org.apache.xml.security.signature.XMLSignature;
 import org.w3c.dom.Document;
 
-public class WSSSignaturePreProcessor extends AbstractWSSecurityPreProcessor { 
+public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -64,8 +64,8 @@ public class WSSSignaturePreProcessor extends AbstractWSSecurityPreProcessor {
 	}
 
 	@Override
-	protected Document build(Document document, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException {
-		return secBuilder.build(document, crypto, secHeader);
+	protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
+		return secBuilder.build(document, getCrypto(), secHeader);
 	}
 
 	// Accessors
@@ -104,10 +104,12 @@ public class WSSSignaturePreProcessor extends AbstractWSSecurityPreProcessor {
 	/* This getter/setter pair seems to be required for the bean introspector when building the GUI,
 	 * otherwise the parent class property will be overwritten when building child class GUIs.
 	 */
+	@Override
 	public String getKeyIdentifier() {
 		return super.getKeyIdentifier();
 	}
 
+	@Override
 	public void setKeyIdentifier(String keyIdentifier) {
 		super.setKeyIdentifier(keyIdentifier);
 	}

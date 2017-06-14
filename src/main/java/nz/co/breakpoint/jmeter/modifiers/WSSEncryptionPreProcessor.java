@@ -9,7 +9,7 @@ import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.w3c.dom.Document;
 
-public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor { 
+public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -55,8 +55,8 @@ public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor {
 	}
 
 	@Override
-	protected Document build(Document document, Crypto crypto, WSSecHeader secHeader) throws WSSecurityException {
-		return secBuilder.build(document, crypto, secHeader);
+	protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
+		return secBuilder.build(document, getCrypto(), secHeader);
 	}
 
 	// Accessors
@@ -87,10 +87,12 @@ public class WSSEncryptionPreProcessor extends AbstractWSSecurityPreProcessor {
 	/* This getter/setter pair seems to be required for the bean introspector when building the GUI,
 	 * otherwise the parent class property will be overwritten when building child class GUIs.
 	 */
+	@Override
 	public String getKeyIdentifier() {
 		return super.getKeyIdentifier();
 	}
 
+	@Override
 	public void setKeyIdentifier(String keyIdentifier) {
 		super.setKeyIdentifier(keyIdentifier);
 	}

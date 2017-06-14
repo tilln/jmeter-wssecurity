@@ -7,28 +7,21 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecBase;
-import org.apache.wss4j.dom.WSConstants;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import static org.apache.wss4j.common.crypto.Merlin.PREFIX;
-import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_FILE;
-import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_PASSWORD;
-import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_TYPE;
-
+/**
+ * Abstract base class for any preprocessor that creates/modifies a SOAP WSS header in the sampler payload.
+ * Subclasses need to provide an actual wss4j WSSecBase instance and implement some wrapper methods.
+ */
 public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement implements PreProcessor, TestBean { 
 
 	private static final Logger log = LoggingManager.getLoggerForClass();
@@ -38,42 +31,12 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 
 	transient private final DocumentBuilder docBuilder; // Handles the XML document
 
-	private final Properties cryptoProps; // Holds configured attributes for crypto instance
-
-	private String certAlias, certPassword; // Certificate alias and password (if private cert)
-
-	private List<SecurityPart> partsToSecure; // Holds the names of XML elements to secure (e.g. SOAP Body)
-
-	static final Map<String, Integer> keyIdentifierMap = new HashMap<String, Integer>();
-	static {
-		keyIdentifierMap.put("Binary Security Token",         WSConstants.BST_DIRECT_REFERENCE);
-		keyIdentifierMap.put("Issuer Name and Serial Number", WSConstants.ISSUER_SERIAL);
-		keyIdentifierMap.put("X509 Certificate",              WSConstants.X509_KEY_IDENTIFIER);
-		keyIdentifierMap.put("Subject Key Identifier",        WSConstants.SKI_KEY_IDENTIFIER);
-		keyIdentifierMap.put("Thumbprint SHA1 Identifier",    WSConstants.THUMBPRINT_IDENTIFIER);
-		keyIdentifierMap.put("Encrypted Key SHA1",            WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER); // only for encryption (symmetric signature not implemented yet - would require UI fields for setSecretKey or setEncrKeySha1value)
-		keyIdentifierMap.put("Custom Key Identifier",         WSConstants.CUSTOM_KEY_IDENTIFIER); // not implemented yet (requires UI fields for setCustomTokenId and setCustomTokenValueType)
-		keyIdentifierMap.put("Key Value",                     WSConstants.KEY_VALUE); // only for signature
-		keyIdentifierMap.put("Endpoint Key Identifier",       WSConstants.ENDPOINT_KEY_IDENTIFIER); // not supported by Merlin https://ws.apache.org/wss4j/apidocs/org/apache/wss4j/common/crypto/Merlin.html#getX509Certificates-org.apache.wss4j.common.crypto.CryptoType-
-	}
+	private String username, password;
 
 	public AbstractWSSecurityPreProcessor() throws ParserConfigurationException {
 		super();
 		docBuilder = factory.newDocumentBuilder();
-		cryptoProps = new Properties();
-		cryptoProps.setProperty("org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin");
-		cryptoProps.setProperty(PREFIX+KEYSTORE_TYPE, "jks");
 		initSecBuilder();
-	}
-
-	/* Reverse lookup for above keyIdentifierMap. Mainly used for populating the GUI dropdown.
-	 */
-	protected static String getKeyIdentifierLabelForType(int keyIdentifierType) {
-		for (Map.Entry<String, Integer> id : keyIdentifierMap.entrySet()) {
-			if (id.getValue() == keyIdentifierType)
-				return id.getKey();
-		}
-		return null;
 	}
 
 	protected Sampler getSampler() {
@@ -98,14 +61,12 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 	/* Subclasses are to implement the actual creation of the signature or encryption,
 	 * as WSSecBase does not define a build method.
 	 */
-	protected abstract Document build(Document document, Crypto crypto, WSSecHeader secHeader)
+	protected abstract Document build(Document document, WSSecHeader secHeader)
 		throws WSSecurityException;
 
 	/* The main method that is called before the sampler.
 	 * This will get, parse, secure (sign or encrypt) and then replace
 	 * the sampler's payload.
-	 * A new crypto instance needs to be created for every iteration
-	 * as the config could contain variables which may change.
 	 */
 	@Override
 	public void process() {
@@ -120,16 +81,13 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 			WSSecHeader secHeader = new WSSecHeader(doc);
 			secHeader.insertSecurityHeader();
 
-			log.debug("Getting crypto instance");
-			Crypto crypto = CryptoFactory.getInstance(cryptoProps);
-
 			log.debug("Building WSS header");
-			doc = this.build(doc, crypto, secHeader); // Delegate in abstract method
+			doc = this.build(doc, secHeader); // Delegate in abstract method
 
 			setSamplerPayload(XMLUtils.prettyDocumentToString(doc));
 		}
-		catch (Exception e) { 
-			log.error(e.toString());
+		catch (Exception e) {
+			log.error("Processing failed! ", e);
 		}
 		/* There is no cleanup method in the wss4j API, so we have to discard the old instance
 		 * and create a fresh one during the next iteration.
@@ -141,56 +99,20 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 		initSecBuilder();
 	}
 
-	// Accessors
-	public String getKeystoreFile() {
-		return cryptoProps.getProperty(PREFIX+KEYSTORE_FILE); 
+	// Accessors (protected for subclasses to use but hidden from bean introspector, or they would show on subclass GUIs) 
+	protected String getUsername() {
+		return username;
 	}
 
-	public void setKeystoreFile(String keystoreFile) {
-		cryptoProps.setProperty(PREFIX+KEYSTORE_FILE, keystoreFile); 
+	protected void setUsername(String username) {
+		getSecBuilder().setUserInfo(this.username = username, password);
 	}
 
-	public String getKeystorePassword() {
-		return cryptoProps.getProperty(PREFIX+KEYSTORE_PASSWORD);
+	protected String getPassword() {
+		return password;
 	}
 
-	public void setKeystorePassword(String keystorePassword) {
-		cryptoProps.setProperty(PREFIX+KEYSTORE_PASSWORD, keystorePassword);
+	protected void setPassword(String password) {
+		getSecBuilder().setUserInfo(username, this.password = password);
 	}
-
-	public String getCertAlias() {
-		return certAlias;
-	}
-
-	public void setCertAlias(String certAlias) {
-		getSecBuilder().setUserInfo(this.certAlias = certAlias, certPassword);
-	}
-
-	public String getCertPassword() {
-		return certPassword;
-	}
-
-	public void setCertPassword(String certPassword) {
-		getSecBuilder().setUserInfo(certAlias, this.certPassword = certPassword);
-	}
-	
-	public String getKeyIdentifier() {
-		return getKeyIdentifierLabelForType(getSecBuilder().getKeyIdentifierType());
-	}
-
-	public void setKeyIdentifier(String keyIdentifier) {
-		getSecBuilder().setKeyIdentifierType(keyIdentifierMap.get(keyIdentifier));
-	}
-
-	public List<SecurityPart> getPartsToSecure() {
-		return partsToSecure;
-	}
-
-	public void setPartsToSecure(List<SecurityPart> partsToSecure) {
-		this.partsToSecure = partsToSecure;
-		getSecBuilder().getParts().clear();
-		for (SecurityPart part : partsToSecure) {
-			getSecBuilder().getParts().add(part.getPart());
-		}
-	}	
 }

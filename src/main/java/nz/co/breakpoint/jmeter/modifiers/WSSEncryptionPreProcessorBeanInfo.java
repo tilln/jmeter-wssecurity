@@ -3,7 +3,7 @@ package nz.co.breakpoint.jmeter.modifiers;
 import java.beans.PropertyDescriptor;
 import org.apache.wss4j.dom.WSConstants;
 
-public class WSSEncryptionPreProcessorBeanInfo extends AbstractWSSecurityPreProcessorBeanInfo {
+public class WSSEncryptionPreProcessorBeanInfo extends CryptoWSSecurityPreProcessorBeanInfo {
 
 	public WSSEncryptionPreProcessorBeanInfo() {
 		super(WSSEncryptionPreProcessor.class);
