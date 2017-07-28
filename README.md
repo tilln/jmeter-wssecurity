@@ -8,9 +8,9 @@ Overview
 
 Apache JMeter plugin for signing and encrypting SOAP messages (WS-Security).
 
-The plugin provides two [Preprocessors](http://jmeter.apache.org/usermanual/component_reference.html#preprocessors)
+The plugin provides [Preprocessors](http://jmeter.apache.org/usermanual/component_reference.html#preprocessors)
 that can be configured for signing and encrypting the payloads of an HTTP Request or JMS Publisher/Point-to-Point sampler
-with a digital certificate from a given JKS keystore.
+with a digital certificate from a given JKS keystore, or for adding a Username Token.
 
 Installation
 ------------
@@ -21,21 +21,21 @@ Under tab "Available Plugins", select "WS Security for SOAP", then click "Apply 
 
 ### Via Package from [JMeter-Plugins.org](https://jmeter-plugins.org/)
 
-Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.2.zip) into JMeter's lib directory, then restart JMeter.
+Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.3.zip) into JMeter's lib directory, then restart JMeter.
 
 ### Via Manual Download
 
-1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.2/jmeter-wssecurity-1.2.jar) into JMeter's lib/ext directory.
+1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.3/jmeter-wssecurity-1.3.jar) into JMeter's lib/ext directory.
 2. Copy the following dependencies into JMeter's lib directory:
-	* [org.apache.wss4j / wss4j-ws-security-dom](http://central.maven.org/maven2/org/apache/wss4j/wss4j-ws-security-dom/2.1.8/wss4j-ws-security-dom-2.1.8.jar)
-	* [org.apache.wss4j / wss4j-ws-security-common](http://central.maven.org/maven2/org/apache/wss4j/wss4j-ws-security-common/2.1.8/wss4j-ws-security-common-2.1.8.jar)
-	* [org.apache.santuario / xmlsec](http://central.maven.org/maven2/org/apache/santuario/xmlsec/2.0.8/xmlsec-2.0.8.jar)
+	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.1.8/wss4j-ws-security-dom-2.1.8.jar)
+	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/2.1.8/wss4j-ws-security-common-2.1.8.jar)
+	* [org.apache.santuario / xmlsec](https://search.maven.org/remotecontent?filepath=org/apache/santuario/xmlsec/2.0.8/xmlsec-2.0.8.jar)
 3. Restart JMeter.
 
 Usage
 ------------
 
-From the context menu, select "Add" / "Pre Processors" / "SOAP Message Signer" or "SOAP Message Encrypter".
+From the context menu, select "Add" / "Pre Processors" / "SOAP Message Signer", "SOAP Message Encrypter" or "SOAP Message UsernameToken".
 
 The message to be signed or encrypted must be a valid SOAP message and must be in one of the following locations:
 * For [HTTP request](http://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request): Tab "Body Data" (not "Parameters")
@@ -53,6 +53,10 @@ Users familiar with SoapUI will find similarities to the [outgoing WS-Security c
 ### SOAP Message Encrypter
 
 ![SOAP Message Encrypter](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/encryption.png)
+
+### SOAP Message Username Token
+
+![SOAP Message Username Token](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/usernametoken.png)
 
 ### Configuration
 
