@@ -7,7 +7,6 @@ import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBase {

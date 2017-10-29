@@ -22,20 +22,14 @@ import org.xml.sax.InputSource;
  * Abstract base class for any preprocessor that creates/modifies a SOAP WSS header in the sampler payload.
  * Subclasses need to provide an actual wss4j WSSecBase instance and implement some wrapper methods.
  */
-public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement implements PreProcessor, TestBean { 
+public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElement implements PreProcessor, TestBean { 
 
 	private static final Logger log = LoggingManager.getLoggerForClass();
-
-	private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	static { factory.setNamespaceAware(true); }
-
-	transient private final DocumentBuilder docBuilder; // Handles the XML document
 
 	private String username, password;
 
 	public AbstractWSSecurityPreProcessor() throws ParserConfigurationException {
 		super();
-		docBuilder = factory.newDocumentBuilder();
 		initSecBuilder();
 	}
 
@@ -75,7 +69,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 
 		try {
 			log.debug("Parsing xml payload");
-			Document doc = docBuilder.parse(new InputSource(new StringReader(xml)));
+			Document doc = stringToDocument(xml);
 
 			log.debug("Initializing WSS header");
 			WSSecHeader secHeader = new WSSecHeader(doc);
@@ -84,7 +78,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractTestElement
 			log.debug("Building WSS header");
 			doc = this.build(doc, secHeader); // Delegate in abstract method
 
-			setSamplerPayload(XMLUtils.prettyDocumentToString(doc));
+			setSamplerPayload(documentToString(doc));
 		}
 		catch (Exception e) {
 			log.error("Processing failed! ", e);
