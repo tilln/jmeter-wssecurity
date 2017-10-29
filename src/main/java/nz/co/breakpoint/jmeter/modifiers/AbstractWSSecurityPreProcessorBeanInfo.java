@@ -4,7 +4,7 @@ import org.apache.jmeter.testbeans.BeanInfoSupport;
 
 public class AbstractWSSecurityPreProcessorBeanInfo extends BeanInfoSupport {
 
-	public AbstractWSSecurityPreProcessorBeanInfo(Class<? extends AbstractWSSecurityPreProcessor> clazz) {
+    public AbstractWSSecurityPreProcessorBeanInfo(Class<? extends AbstractWSSecurityPreProcessor> clazz) {
         super(clazz);
-	}
+    }
 }

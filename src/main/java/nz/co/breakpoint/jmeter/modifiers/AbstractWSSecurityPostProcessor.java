@@ -24,39 +24,39 @@ import org.xml.sax.InputSource;
  */
 public abstract class AbstractWSSecurityPostProcessor extends AbstractXMLTestElement implements PostProcessor, TestBean { 
 
-	private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggingManager.getLoggerForClass();
 
-	public AbstractWSSecurityPostProcessor() throws ParserConfigurationException {
-		super();
-	}
+    public AbstractWSSecurityPostProcessor() throws ParserConfigurationException {
+        super();
+    }
 
-	/* Subclasses are to implement the actual header processing.
-	 */
-	protected abstract Document process(Document document) throws WSSecurityException;
+    /* Subclasses are to implement the actual header processing.
+     */
+    protected abstract Document process(Document document) throws WSSecurityException;
 
-	/* The main method that is called after the sampler.
-	 * This will parse, process (validate or decrypt) and then replace
-	 * the sampler's response.
-	 */
-	@Override
-	public void process() {
+    /* The main method that is called after the sampler.
+     * This will parse, process (validate or decrypt) and then replace
+     * the sampler's response.
+     */
+    @Override
+    public void process() {
         SampleResult prev = getThreadContext().getPreviousResult();
         if (prev == null) return;
 
         String xml = prev.getResponseDataAsString();
-		if (xml == null) return;
+        if (xml == null) return;
 
-		try {
-			log.debug("Parsing xml response");
-			Document doc = stringToDocument(xml);
+        try {
+            log.debug("Parsing xml response");
+            Document doc = stringToDocument(xml);
 
-			log.debug("Processing WSS header");
-			doc = this.process(doc); // Delegate in abstract method
+            log.debug("Processing WSS header");
+            doc = this.process(doc); // Delegate in abstract method
 
             prev.setResponseData(documentToString(doc), prev.getDataEncodingWithDefault());
-		}
-		catch (Exception e) {
-			log.error("Processing failed! ", e);
-		}
-	}
+        }
+        catch (Exception e) {
+            log.error("Processing failed! ", e);
+        }
+    }
 }

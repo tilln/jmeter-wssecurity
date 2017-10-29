@@ -17,15 +17,15 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractXMLTestElement extends AbstractTestElement { 
 
-	private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	static { factory.setNamespaceAware(true); }
+    private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    static { factory.setNamespaceAware(true); }
 
-	transient private final DocumentBuilder docBuilder; // Handles the XML document
+    transient private final DocumentBuilder docBuilder; // Handles the XML document
 
-	public AbstractXMLTestElement() throws ParserConfigurationException {
-		super();
-		docBuilder = factory.newDocumentBuilder();
-	}
+    public AbstractXMLTestElement() throws ParserConfigurationException {
+        super();
+        docBuilder = factory.newDocumentBuilder();
+    }
 
     public Document stringToDocument(String xml) throws IOException, SAXException {
         return (xml == null) ? null : docBuilder.parse(new InputSource(new StringReader(xml)));

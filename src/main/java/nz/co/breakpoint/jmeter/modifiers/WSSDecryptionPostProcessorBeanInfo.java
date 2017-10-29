@@ -5,7 +5,7 @@ import org.apache.wss4j.dom.WSConstants;
 
 public class WSSDecryptionPostProcessorBeanInfo extends CryptoWSSecurityPostProcessorBeanInfo {
 
-	public WSSDecryptionPostProcessorBeanInfo() {
-		super(WSSDecryptionPostProcessor.class);
-	}
+    public WSSDecryptionPostProcessorBeanInfo() {
+        super(WSSDecryptionPostProcessor.class);
+    }
 }

@@ -17,45 +17,45 @@ import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_PASSWORD;
  */
 public abstract class CryptoWSSecurityPostProcessor extends AbstractWSSecurityPostProcessor {
 
-	private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger log = LoggingManager.getLoggerForClass();
 
-	private final Properties cryptoProps; // Holds configured attributes for crypto instance
+    private final Properties cryptoProps; // Holds configured attributes for crypto instance
 
     private String certPassword;
 
-	public CryptoWSSecurityPostProcessor() throws ParserConfigurationException {
-		super();
-		cryptoProps = new Properties();
-	}
+    public CryptoWSSecurityPostProcessor() throws ParserConfigurationException {
+        super();
+        cryptoProps = new Properties();
+    }
 
-	protected Crypto getCrypto() throws WSSecurityException {
-		// A new crypto instance needs to be created for every iteration as the config could contain variables which may change.
-		log.debug("Getting crypto instance");
-		return CryptoFactory.getInstance(cryptoProps);
-	}
+    protected Crypto getCrypto() throws WSSecurityException {
+        // A new crypto instance needs to be created for every iteration as the config could contain variables which may change.
+        log.debug("Getting crypto instance");
+        return CryptoFactory.getInstance(cryptoProps);
+    }
 
-	// Accessors
-	public String getCertPassword() {
-		return certPassword;
-	}
+    // Accessors
+    public String getCertPassword() {
+        return certPassword;
+    }
 
-	public void setCertPassword(String certPassword) {
-		this.certPassword = certPassword;
-	}
+    public void setCertPassword(String certPassword) {
+        this.certPassword = certPassword;
+    }
 
-	public String getKeystoreFile() {
-		return cryptoProps.getProperty(PREFIX+KEYSTORE_FILE);
-	}
+    public String getKeystoreFile() {
+        return cryptoProps.getProperty(PREFIX+KEYSTORE_FILE);
+    }
 
-	public void setKeystoreFile(String keystoreFile) {
-		cryptoProps.setProperty(PREFIX+KEYSTORE_FILE, keystoreFile);
-	}
+    public void setKeystoreFile(String keystoreFile) {
+        cryptoProps.setProperty(PREFIX+KEYSTORE_FILE, keystoreFile);
+    }
 
-	public String getKeystorePassword() {
-		return cryptoProps.getProperty(PREFIX+KEYSTORE_PASSWORD);
-	}
+    public String getKeystorePassword() {
+        return cryptoProps.getProperty(PREFIX+KEYSTORE_PASSWORD);
+    }
 
-	public void setKeystorePassword(String keystorePassword) {
-		cryptoProps.setProperty(PREFIX+KEYSTORE_PASSWORD, keystorePassword);
-	}
+    public void setKeystorePassword(String keystorePassword) {
+        cryptoProps.setProperty(PREFIX+KEYSTORE_PASSWORD, keystorePassword);
+    }
 }

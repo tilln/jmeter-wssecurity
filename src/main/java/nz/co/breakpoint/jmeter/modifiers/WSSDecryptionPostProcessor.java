@@ -13,14 +13,14 @@ import org.w3c.dom.Document;
 
 public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public WSSDecryptionPostProcessor() throws ParserConfigurationException {
-		super();
+    public WSSDecryptionPostProcessor() throws ParserConfigurationException {
+        super();
     }
 
-	@Override
-	protected Document process(Document document) throws WSSecurityException {
+    @Override
+    protected Document process(Document document) throws WSSecurityException {
         WSSecurityEngine secEngine = new WSSecurityEngine();
 
         WSHandlerResult results = secEngine.processSecurityHeader(document, null, 
@@ -35,5 +35,5 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
             }, getCrypto());
 
         return document;
-	}
+    }
 }

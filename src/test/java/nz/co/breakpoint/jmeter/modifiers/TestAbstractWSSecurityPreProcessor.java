@@ -16,66 +16,66 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class TestAbstractWSSecurityPreProcessor extends TestWSSSecurityPreProcessorBase {
-	private DummyWSSecurityPreProcessor instance = null;
+    private DummyWSSecurityPreProcessor instance = null;
 
-	class DummyWSSecurityPreProcessor extends AbstractWSSecurityPreProcessor {
-		public DummyWSSecurityPreProcessor() throws ParserConfigurationException {
-			super();
-		}
+    class DummyWSSecurityPreProcessor extends AbstractWSSecurityPreProcessor {
+        public DummyWSSecurityPreProcessor() throws ParserConfigurationException {
+            super();
+        }
 
-		@Override
-		protected WSSecBase getSecBuilder() {
-			return null;
-		}
+        @Override
+        protected WSSecBase getSecBuilder() {
+            return null;
+        }
 
-		@Override
-		protected void initSecBuilder() {
-			// no-op implementation for testing
-		}
+        @Override
+        protected void initSecBuilder() {
+            // no-op implementation for testing
+        }
 
-		@Override
-		protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
-			return document;
-		}
-	}
+        @Override
+        protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
+            return document;
+        }
+    }
 
-	@Before
-	public void setUp() throws Exception {
-		context = JMeterContextService.getContext();
-		instance = new DummyWSSecurityPreProcessor();
-		instance.setThreadContext(context);
-	}
+    @Before
+    public void setUp() throws Exception {
+        context = JMeterContextService.getContext();
+        instance = new DummyWSSecurityPreProcessor();
+        instance.setThreadContext(context);
+    }
 
-	@Test
-	public void testGetPayloadOfOtherSampler() throws Exception {
-		JMSSampler sampler = new JMSSampler();
-		context.setCurrentSampler(sampler);
+    @Test
+    public void testGetPayloadOfOtherSampler() throws Exception {
+        JMSSampler sampler = new JMSSampler();
+        context.setCurrentSampler(sampler);
 
-		sampler.setContent(SAMPLE_SOAP_MSG);
-		String payload = instance.getSamplerPayload();
-		assertEquals(SAMPLE_SOAP_MSG, payload);
-	}
+        sampler.setContent(SAMPLE_SOAP_MSG);
+        String payload = instance.getSamplerPayload();
+        assertEquals(SAMPLE_SOAP_MSG, payload);
+    }
 
-	@Test
-	public void testSetPayloadOfOtherSampler() throws Exception {
-		JMSSampler sampler = new JMSSampler();
-		context.setCurrentSampler(sampler);
+    @Test
+    public void testSetPayloadOfOtherSampler() throws Exception {
+        JMSSampler sampler = new JMSSampler();
+        context.setCurrentSampler(sampler);
 
-		instance.setSamplerPayload(SAMPLE_SOAP_MSG);
-		String payload = sampler.getContent();
-		assertEquals(SAMPLE_SOAP_MSG, payload);
-	}
+        instance.setSamplerPayload(SAMPLE_SOAP_MSG);
+        String payload = sampler.getContent();
+        assertEquals(SAMPLE_SOAP_MSG, payload);
+    }
 
-	@Test
-	public void testProcess() throws Exception {
-		JMSSampler sampler = new JMSSampler();
-		context.setCurrentSampler(sampler);
-		final String xml = "<x>✓</x>";
-		sampler.setContent(xml);
+    @Test
+    public void testProcess() throws Exception {
+        JMSSampler sampler = new JMSSampler();
+        context.setCurrentSampler(sampler);
+        final String xml = "<x>✓</x>";
+        sampler.setContent(xml);
 
-		instance.process();
-		String payload = sampler.getContent();
-		assertThat(payload, containsString(">✓<"));
-		assertThat(payload, containsString(":Security"));
-	}
+        instance.process();
+        String payload = sampler.getContent();
+        assertThat(payload, containsString(">✓<"));
+        assertThat(payload, containsString(":Security"));
+    }
 }

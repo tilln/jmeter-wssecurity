@@ -12,26 +12,26 @@ import org.apache.wss4j.common.WSEncryptionPart;
  * the entire XML element or only its content.
  */
 public class SecurityPart extends AbstractTestElement {
-	
-	private static final String NAMESPACE = "SecurityPart.Namespace", MODIFIER = "SecurityPart.Modifier";
+    
+    private static final String NAMESPACE = "SecurityPart.Namespace", MODIFIER = "SecurityPart.Modifier";
 
-	public SecurityPart() {}
+    public SecurityPart() {}
 
-	public String getNamespace() { return getPropertyAsString(NAMESPACE); }
+    public String getNamespace() { return getPropertyAsString(NAMESPACE); }
 
-	public void setNamespace(String namespace) { setProperty(NAMESPACE, namespace); }
+    public void setNamespace(String namespace) { setProperty(NAMESPACE, namespace); }
 
-	public String getModifier() { return getPropertyAsString(MODIFIER); }
+    public String getModifier() { return getPropertyAsString(MODIFIER); }
 
-	/* @param modifier: "Content" or "Element"
-	 */
-	public void setModifier(String modifier) { setProperty(MODIFIER, modifier); }
+    /* @param modifier: "Content" or "Element"
+     */
+    public void setModifier(String modifier) { setProperty(MODIFIER, modifier); }
 
-	/* Convenience method for Preprocessor accessor
-	 */
-	public WSEncryptionPart getPart() {
-		WSEncryptionPart part = new WSEncryptionPart(getName(), getNamespace(), getModifier());
-		part.setRequired(false); // treat as optional
-		return part;
-	}
+    /* Convenience method for Preprocessor accessor
+     */
+    public WSEncryptionPart getPart() {
+        WSEncryptionPart part = new WSEncryptionPart(getName(), getNamespace(), getModifier());
+        part.setRequired(false); // treat as optional
+        return part;
+    }
 }

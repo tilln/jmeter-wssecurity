@@ -11,9 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestWSSSecurityPreProcessorBase {
-	protected JMeterContext context = null;
-	
-	protected static final String SAMPLE_SOAP_MSG = 
+    protected JMeterContext context = null;
+    
+    protected static final String SAMPLE_SOAP_MSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -24,26 +24,26 @@ public class TestWSSSecurityPreProcessorBase {
         +           "<value xmlns=\"\">15</value>" 
         +       "</add>" 
         +   "</SOAP-ENV:Body>" 
-        + "</SOAP-ENV:Envelope>";	
+        + "</SOAP-ENV:Envelope>";    
 
-	static HTTPSamplerBase createHTTPSampler() {
-		HTTPSamplerBase sampler = HTTPSamplerFactory.newInstance();
-		sampler.addNonEncodedArgument("", SAMPLE_SOAP_MSG, "");
-		sampler.setPostBodyRaw(true);
-		return sampler;
-	}
-	
-	static void initCertSettings(CryptoWSSecurityPreProcessor mod) {
-		initCertSettings(mod, WSSSignaturePreProcessor.signatureAlgorithms[0]);
-	}
+    static HTTPSamplerBase createHTTPSampler() {
+        HTTPSamplerBase sampler = HTTPSamplerFactory.newInstance();
+        sampler.addNonEncodedArgument("", SAMPLE_SOAP_MSG, "");
+        sampler.setPostBodyRaw(true);
+        return sampler;
+    }
+    
+    static void initCertSettings(CryptoWSSecurityPreProcessor mod) {
+        initCertSettings(mod, WSSSignaturePreProcessor.signatureAlgorithms[0]);
+    }
 
-	static void initCertSettings(CryptoWSSecurityPreProcessor mod, String signatureAlgorithm) {
-		mod.setKeystoreFile("src/test/resources/keystore.jks");
-		mod.setKeystorePassword("changeit");
-		mod.setCertAlias(
-			signatureAlgorithm.startsWith("http://www.w3.org/2000/09/xmldsig#dsa") ? "dsa" :
-			signatureAlgorithm.startsWith("http://www.w3.org/2001/04/xmldsig-more#ecdsa") ? "ec" :
-			"rsa");
-		mod.setCertPassword("changeit");
-	}
+    static void initCertSettings(CryptoWSSecurityPreProcessor mod, String signatureAlgorithm) {
+        mod.setKeystoreFile("src/test/resources/keystore.jks");
+        mod.setKeystorePassword("changeit");
+        mod.setCertAlias(
+            signatureAlgorithm.startsWith("http://www.w3.org/2000/09/xmldsig#dsa") ? "dsa" :
+            signatureAlgorithm.startsWith("http://www.w3.org/2001/04/xmldsig-more#ecdsa") ? "ec" :
+            "rsa");
+        mod.setCertPassword("changeit");
+    }
 }
