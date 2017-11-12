@@ -1,9 +1,7 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.protocol.jms.sampler.JMSSampler;
-import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.WSSecHeader;

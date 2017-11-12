@@ -1,14 +1,8 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.containsString;
-
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerFactory;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.threads.JMeterContext;
-import org.apache.jmeter.threads.JMeterContextService;
-import org.junit.Before;
-import org.junit.Test;
 
 public class TestWSSSecurityPreProcessorBase {
     protected JMeterContext context = null;

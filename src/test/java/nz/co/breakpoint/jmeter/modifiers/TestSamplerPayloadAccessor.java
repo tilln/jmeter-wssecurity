@@ -1,14 +1,8 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import java.beans.PropertyDescriptor;
-import org.apache.jmeter.protocol.http.sampler.HTTPSamplerFactory;
 import org.apache.jmeter.protocol.jms.sampler.JMSSampler;
-import org.apache.jmeter.util.JMeterUtils;
-import org.junit.Before;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class TestSamplerPayloadAccessor {
     @Test

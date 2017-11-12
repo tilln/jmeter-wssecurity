@@ -5,7 +5,6 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
-import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.WSSecBase;
 import org.apache.wss4j.dom.message.WSSecHeader;

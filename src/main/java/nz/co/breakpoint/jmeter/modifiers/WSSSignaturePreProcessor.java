@@ -1,7 +1,6 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecBase;

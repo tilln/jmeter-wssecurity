@@ -19,13 +19,12 @@ public abstract class CryptoWSSecurityPostProcessor extends AbstractWSSecurityPo
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
-    private final Properties cryptoProps; // Holds configured attributes for crypto instance
+    private final Properties cryptoProps = new Properties(); // Holds configured attributes for crypto instance
 
     private String certPassword;
 
     public CryptoWSSecurityPostProcessor() throws ParserConfigurationException {
         super();
-        cryptoProps = new Properties();
     }
 
     protected Crypto getCrypto() throws WSSecurityException {

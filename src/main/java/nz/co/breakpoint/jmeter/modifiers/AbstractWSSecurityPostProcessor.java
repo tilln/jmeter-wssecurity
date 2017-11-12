@@ -1,22 +1,15 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
+import javax.xml.parsers.ParserConfigurationException;
+import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.processor.PostProcessor;
-import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testbeans.TestBean;
-import org.apache.jmeter.testelement.AbstractTestElement;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
-import java.io.StringReader;
-import java.util.Properties;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.WSSecHeader;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 /**
  * Abstract base class for any postprocessor that validates/decrypts a SOAP WSS header in the sampler response.
@@ -25,6 +18,8 @@ import org.xml.sax.InputSource;
 public abstract class AbstractWSSecurityPostProcessor extends AbstractXMLTestElement implements PostProcessor, TestBean { 
 
     private static final Logger log = LoggingManager.getLoggerForClass();
+
+    static final String FAIL_ON_WSS_EXCEPTION = "jmeter.wssecurity.failSamplerOnWSSException";
 
     public AbstractWSSecurityPostProcessor() throws ParserConfigurationException {
         super();
@@ -57,6 +52,13 @@ public abstract class AbstractWSSecurityPostProcessor extends AbstractXMLTestEle
         }
         catch (Exception e) {
             log.error("Processing failed! ", e);
+            if (e instanceof WSSecurityException && JMeterUtils.getPropDefault(FAIL_ON_WSS_EXCEPTION, true)) {
+                AssertionResult assertionResult = new AssertionResult("WSSecurityException").setResultForFailure(e.getMessage());
+                assertionResult.setError(true);
+                assertionResult.setFailure(true);
+                prev.addAssertionResult(assertionResult);
+                prev.setSuccessful(false);
+            }
         }
     }
 }

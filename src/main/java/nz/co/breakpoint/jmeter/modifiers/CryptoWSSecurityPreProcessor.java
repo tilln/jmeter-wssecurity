@@ -15,7 +15,6 @@ import org.apache.wss4j.dom.WSConstants;
 import static org.apache.wss4j.common.crypto.Merlin.PREFIX;
 import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_FILE;
 import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_PASSWORD;
-import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_TYPE;
 
 /**
  * Abstract parent class of any preprocessors that perform crypto operations (e.g. signature or encryption).
@@ -24,7 +23,7 @@ public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPre
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
-    private final Properties cryptoProps; // Holds configured attributes for crypto instance
+    private final Properties cryptoProps = new Properties(); // Holds configured attributes for crypto instance
 
     private List<SecurityPart> partsToSecure; // Holds the names of XML elements to secure (e.g. SOAP Body)
 
@@ -43,9 +42,6 @@ public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPre
 
     public CryptoWSSecurityPreProcessor() throws ParserConfigurationException {
         super();
-        cryptoProps = new Properties();
-        cryptoProps.setProperty("org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin");
-        cryptoProps.setProperty(PREFIX+KEYSTORE_TYPE, "jks");
     }
 
     /* Reverse lookup for above keyIdentifierMap. Mainly used for populating the GUI dropdown.

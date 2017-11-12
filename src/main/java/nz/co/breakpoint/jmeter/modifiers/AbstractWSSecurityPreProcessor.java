@@ -3,20 +3,13 @@ package nz.co.breakpoint.jmeter.modifiers;
 import org.apache.jmeter.processor.PreProcessor;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testbeans.TestBean;
-import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
-import java.io.StringReader;
-import java.util.Properties;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecBase;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 /**
  * Abstract base class for any preprocessor that creates/modifies a SOAP WSS header in the sampler payload.
