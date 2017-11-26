@@ -6,11 +6,17 @@
 Overview
 ------------
 
-Apache JMeter plugin for signing and encrypting SOAP messages (WS-Security).
+Apache JMeter plugin for signing, encrypting and decrypting SOAP messages (WS-Security).
 
-The plugin provides [Preprocessors](http://jmeter.apache.org/usermanual/component_reference.html#preprocessors)
-that can be configured for signing and encrypting the payloads of an HTTP Request or JMS Publisher/Point-to-Point sampler
-with a digital certificate from a given JKS keystore, or for adding a Username Token.
+The plugin provides 
+* [Pre-Processors](http://jmeter.apache.org/usermanual/component_reference.html#preprocessors) 
+for adding digital signature or encryption to a sampler's payload (based on a certificate from a given keystore),
+* a Pre-Processor for adding a Username Token to a sampler's payload,
+* a [Post-Processor](http://jmeter.apache.org/usermanual/component_reference.html#postprocessors)
+for decrypting a sampler's response.
+
+Supported are HTTP Request, JMS Publisher and JMS Point-to-Point samplers, as well as third party samplers 
+that expose the payload via a pair of getter/setter methods.
 
 Installation
 ------------
@@ -21,11 +27,11 @@ Under tab "Available Plugins", select "WS Security for SOAP", then click "Apply 
 
 ### Via Package from [JMeter-Plugins.org](https://jmeter-plugins.org/)
 
-Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.3.zip) into JMeter's lib directory, then restart JMeter.
+Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.4.zip) into JMeter's lib directory, then restart JMeter.
 
 ### Via Manual Download
 
-1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.3/jmeter-wssecurity-1.3.jar) into JMeter's lib/ext directory.
+1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.4/jmeter-wssecurity-1.4.jar) into JMeter's lib/ext directory.
 2. Copy the following dependencies into JMeter's lib directory:
 	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.1.8/wss4j-ws-security-dom-2.1.8.jar)
 	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/2.1.8/wss4j-ws-security-common-2.1.8.jar)
@@ -42,7 +48,9 @@ The message to be signed or encrypted must be a valid SOAP message and must be i
 * For [JMS Point-to-Point](http://jmeter.apache.org/usermanual/component_reference.html#JMS_Point-to-Point): Text area "Content"
 * For [JMS Publisher](http://jmeter.apache.org/usermanual/component_reference.html#JMS_Publisher): Text area "Text Message..." with "Message source": Textarea (from files is not supported)
 
-*Note that the plugin does not assist with composing the message nor does it do any XML schema validation.*
+*Note that the plugin does not assist with composing the message nor does it do any XML schema validation.
+Only the WS-Security header element will be inserted or modified.*
+*It is recommended to exclude the WS-Security header from the SOAP request.*
 
 Users familiar with SoapUI will find similarities to the [outgoing WS-Security configuration](https://www.soapui.org/soapui-projects/ws-security.html#3-Outgoing-WS-Security-configurations).
 
@@ -58,7 +66,14 @@ Users familiar with SoapUI will find similarities to the [outgoing WS-Security c
 
 ![SOAP Message Username Token](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/usernametoken.png)
 
-### Configuration
+### SOAP Message Decrypter
+
+![SOAP Message Decrypter](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/decryption.png)
+
+Configuration
+-------------
+
+### Pre-Processors
 
 The dropdown fields are initialized with WSS default values, and allow the customization of most signature and encryption settings, 
 depending on what the endpoint's WSDL defines.
@@ -72,7 +87,7 @@ Suppose the Timestamp element was to be included in the signature or encryption 
 |Body|http://schemas.xmlsoap.org/soap/envelope/ | |
 |Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd | |
 
-*Note that the Timestamp element is not inserted by the Preprocessor but has to be present in the payload.*
+*Note that the Timestamp element is not inserted by the Pre-Processor but has to be present in the payload.*
 
 Encode is only relevant for encryption and can be one of the following:
 * "Element" (default): The entire XML element is encrypted.
@@ -80,13 +95,22 @@ Encode is only relevant for encryption and can be one of the following:
 * "Header": Encloses the XML element in an EncryptedHeader element ("http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd"), 
 but only if it is an immediate child node of the SOAP Header.
 
+### Post-Processor
+
+Any WS-Security related exception encountered by the SOAP Message Decrypter 
+while trying to decrypt a response message will cause the sampler to fail and will create an 
+[assertion](http://jmeter.apache.org/usermanual/component_reference.html#assertions) result, 
+effectively behaving like an implicit assertion.
+
+If this behaviour is not desired, it may be turned off via setting the JMeter property `jmeter.wssecurity.failSamplerOnWSSException=false`.
+
 ### Support for 3rd party samplers
 
 Samplers that are not JMeter core functionality, such as [JMeter-Plugins](http://jmeter-plugins.org), can also be used
 if they provide a getter/setter pair to access a String property that contains the sampler's payload that is to be signed or encrypted.
 
 In that case, the JMeter property `jmeter.wssecurity.samplerPayloadAccessors` can be used to specify the class and member name (without the get/set prefix) 
-which the Preprocessor will access at run time via Reflection.
+which the Pre-Processor will access at run time via Reflection.
 
 Suppose a sampler like the following:
 ```java
@@ -118,3 +142,4 @@ etc.
 It may be useful to increase the logging level in order to investigate any keystore or encryption related issues, 
 for example by adding `--loglevel=org.apache.wss4j=DEBUG` to the JMeter command line. 
 
+It may also be helpful to inspect server side logs, especially for HTTP 500 type responses, unspecific SOAP Fault messages etc.
