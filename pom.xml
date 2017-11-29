@@ -4,7 +4,7 @@
 	<groupId>nz.co.breakpoint</groupId>
 	<artifactId>jmeter-wssecurity</artifactId>
 	<packaging>jar</packaging>
-	<version>1.4</version>
+	<version>1.5-SNAPSHOT</version>
 	<name>jmeter-wssecurity</name>
 	<url>http://maven.apache.org</url>
 

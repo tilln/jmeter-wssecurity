@@ -11,43 +11,41 @@ import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.w3c.dom.Document;
 
 public class WSSTimestampPreProcessor extends AbstractWSSecurityPreProcessor {
-	private static final Logger log = LoggingManager.getLoggerForClass();
-	transient private WSSecTimestamp secBuilder;
 
-	private int timeToLive;
+    private static final Logger log = LoggingManager.getLoggerForClass();
 
-	public WSSTimestampPreProcessor() throws ParserConfigurationException {
-		super();
-	}
+    transient private WSSecTimestamp secBuilder;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4390837640018590558L;
+    private int timeToLive;
 
-	@Override
-	protected WSSecBase getSecBuilder() {
-		return secBuilder;
-	}
+    public WSSTimestampPreProcessor() throws ParserConfigurationException {
+        super();
+    }
 
-	@Override
-	protected void initSecBuilder() {
-		secBuilder = new WSSecTimestamp();
-	}
+    private static final long serialVersionUID = -4390837640018590558L;
 
-	@Override
-	protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
-		secBuilder.setTimeToLive(timeToLive);
-		log.info("Time to live: " + timeToLive);
-		return secBuilder.build(document, secHeader);
-	}
+    @Override
+    protected WSSecBase getSecBuilder() {
+        return secBuilder;
+    }
 
-	public int getTimeToLive() {
-		return timeToLive;
-	}
+    @Override
+    protected void initSecBuilder() {
+        secBuilder = new WSSecTimestamp();
+    }
 
-	public void setTimeToLive(int timeToLive) {
-		this.timeToLive = timeToLive;
-	}
+    @Override
+    protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
+        secBuilder.setTimeToLive(timeToLive);
+        log.debug("Time to live: " + timeToLive);
+        return secBuilder.build(document, secHeader);
+    }
 
+    public int getTimeToLive() {
+        return timeToLive;
+    }
+
+    public void setTimeToLive(int timeToLive) {
+        this.timeToLive = timeToLive;
+    }
 }
