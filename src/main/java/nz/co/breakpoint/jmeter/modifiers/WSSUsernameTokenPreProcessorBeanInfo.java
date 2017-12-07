@@ -9,7 +9,7 @@ public class WSSUsernameTokenPreProcessorBeanInfo extends AbstractWSSecurityPreP
         super(WSSUsernameTokenPreProcessor.class);
 
         createPropertyGroup("UsernameToken", new String[]{ 
-            "username", "password", "passwordType", "addNonce", "addCreated"
+            "username", "password", "passwordType", "addNonce", "addCreated", "precisionInMilliSeconds"
         });
         PropertyDescriptor p;
 
@@ -33,6 +33,10 @@ public class WSSUsernameTokenPreProcessorBeanInfo extends AbstractWSSecurityPreP
         p.setValue(DEFAULT, Boolean.TRUE);
 
         p = property("addCreated");
+        p.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        p.setValue(DEFAULT, Boolean.TRUE);
+        
+        p = property("precisionInMilliSeconds");
         p.setValue(NOT_UNDEFINED, Boolean.TRUE);
         p.setValue(DEFAULT, Boolean.TRUE);
     }

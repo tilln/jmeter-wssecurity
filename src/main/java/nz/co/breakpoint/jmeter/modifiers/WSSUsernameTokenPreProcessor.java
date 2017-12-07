@@ -23,6 +23,7 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
     private String passwordType;
     private boolean addNonce;
     private boolean addCreated;
+    private boolean precisionInMilliSeconds;
 
     static final Map<String, String> passwordTypeMap = new HashMap<String, String>();
     static {
@@ -66,6 +67,7 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
         if (addNonce) secBuilder.addNonce();
         if (addCreated) secBuilder.addCreated();
+        secBuilder.setPrecisionInMilliSeconds(precisionInMilliSeconds);
         return secBuilder.build(document, secHeader);
     }
 
@@ -94,7 +96,15 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
         this.addCreated = addCreated;
     }
 
-    // Make accessors public for bean introspector to build the GUI.
+    public boolean isPrecisionInMilliSeconds() {
+		return precisionInMilliSeconds;
+	}
+
+	public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
+		this.precisionInMilliSeconds = precisionInMilliSeconds;
+	}
+
+	// Make accessors public for bean introspector to build the GUI.
     public String getUsername() {
         return super.getUsername();
     }
