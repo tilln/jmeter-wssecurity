@@ -1,6 +1,7 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 
@@ -51,6 +52,25 @@ public class TestWSSUsernameTokenPreProcessor extends TestWSSSecurityPreProcesso
                         : not(containsString(":Created")));
                 }
             }
+        }
+    }
+
+    @Test
+    public void testTimestampPrecision() throws Exception {
+        for (boolean millis : new boolean[]{true, false}) {
+            mod = new WSSUsernameTokenPreProcessor();
+            mod.setThreadContext(context);
+            mod.setUsername(USERNAME);
+            mod.setPassword(PASSWORD);
+            mod.setAddCreated(true);
+            mod.setPrecisionInMilliSeconds(millis);
+            HTTPSamplerBase sampler = createHTTPSampler();
+            context.setCurrentSampler(sampler);
+            mod.process();
+            String content = SamplerPayloadAccessor.getPayload(sampler);
+            assertThat(content, containsString(":UsernameToken"));
+            assertTrue(content.matches(
+                ".*:Created>\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d"+(millis ? "\\.\\d\\d\\d" : "")+"\\D+</.*"));
         }
     }
 }
