@@ -28,6 +28,7 @@ public class TestWSSUsernameTokenPreProcessor extends TestWSSSecurityPreProcesso
         for (String pt : WSSUsernameTokenPreProcessor.passwordTypes) {
             boolean isDigest = WSConstants.PASSWORD_DIGEST.equals(WSSUsernameTokenPreProcessor.passwordTypeMap.get(pt));
             boolean isText = WSConstants.PASSWORD_TEXT.equals(WSSUsernameTokenPreProcessor.passwordTypeMap.get(pt));
+            boolean isNone = (null == WSSUsernameTokenPreProcessor.passwordTypeMap.get(pt));
             for (boolean an : new boolean[]{true, false}) {
                 for (boolean ac : new boolean[]{true, false}) {
                     mod = new WSSUsernameTokenPreProcessor();
@@ -43,7 +44,8 @@ public class TestWSSUsernameTokenPreProcessor extends TestWSSSecurityPreProcesso
                     String content = SamplerPayloadAccessor.getPayload(sampler);
                     assertThat(content, containsString(":UsernameToken"));
                     assertThat(content, containsString(">"+USERNAME+"<"));
-                    assertThat(content, containsString(":Password"));
+                    assertThat(content, isNone ? not(containsString(":Password"))
+                        : containsString(":Password"));
                     assertThat(content, isText ? containsString(PASSWORD) 
                         : not(containsString(PASSWORD)));
                     assertThat(content, an || isDigest ? containsString(":Nonce") 
@@ -60,6 +62,7 @@ public class TestWSSUsernameTokenPreProcessor extends TestWSSSecurityPreProcesso
         for (boolean millis : new boolean[]{true, false}) {
             mod = new WSSUsernameTokenPreProcessor();
             mod.setThreadContext(context);
+            mod.setPasswordType("Password Digest");
             mod.setUsername(USERNAME);
             mod.setPassword(PASSWORD);
             mod.setAddCreated(true);

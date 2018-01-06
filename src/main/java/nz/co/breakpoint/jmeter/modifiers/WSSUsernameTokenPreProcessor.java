@@ -29,6 +29,7 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
     static {
         passwordTypeMap.put("Password Digest", WSConstants.PASSWORD_DIGEST);
         passwordTypeMap.put("Password Text",   WSConstants.PASSWORD_TEXT);
+        passwordTypeMap.put("No Password",     null); // wss4j does not seem to use WSConstants.PW_NONE
     }
 
     /* Currently supported attributes are listed below.
@@ -36,7 +37,8 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
      */
     static final String[] passwordTypes = new String[]{
         getPasswordTypeLabelForType(WSConstants.PASSWORD_DIGEST),
-        getPasswordTypeLabelForType(WSConstants.PASSWORD_TEXT)
+        getPasswordTypeLabelForType(WSConstants.PASSWORD_TEXT),
+        getPasswordTypeLabelForType(null)
     };
 
     public WSSUsernameTokenPreProcessor() throws ParserConfigurationException {
@@ -47,7 +49,8 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
      */
     protected static String getPasswordTypeLabelForType(String passwordType) {
         for (Map.Entry<String, String> id : passwordTypeMap.entrySet()) {
-            if (passwordType.equals(id.getValue()))
+            if (passwordType != null && passwordType.equals(id.getValue())
+                || passwordType == null && passwordType == id.getValue())
                 return id.getKey();
         }
         return null;
@@ -68,6 +71,14 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
         if (addNonce) secBuilder.addNonce();
         if (addCreated) secBuilder.addCreated();
         secBuilder.setPrecisionInMilliSeconds(precisionInMilliSeconds);
+        if (passwordType == null) {
+            /* An empty password GUI field will result in an empty password string "", regardless of password type.
+             * This would cause a NPE in org.apache.wss4j.dom.message.token.UsernameToken.setPassword("") 
+             * when trying to retrieve the password element that is not there (as per password type).
+             * Therefore it needs to be set to null explicitly.
+             */
+            setPassword(null);
+        }
         return secBuilder.build(document, secHeader);
     }
 
@@ -77,7 +88,7 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
     }
 
     public void setPasswordType(String passwordType) {
-        secBuilder.setPasswordType(passwordTypeMap.get(this.passwordType = passwordType));
+        secBuilder.setPasswordType(this.passwordType = passwordTypeMap.get(passwordType));
     }
 
     public boolean getAddNonce() {
