@@ -39,7 +39,7 @@ public class CryptoWSSecurityPreProcessorBeanInfo extends AbstractWSSecurityPreP
         p = property(PARTSTOSECURE); // this is expected to be added to a property group by subclasses
         p.setPropertyEditorClass(TableEditor.class);
         p.setValue(TableEditor.CLASSNAME, SecurityPart.class.getName());
-        p.setValue(TableEditor.HEADERS, new String[]{"Name", "Namespace", "Encode"});
-        p.setValue(TableEditor.OBJECT_PROPERTIES, new String[]{"name", "namespace", "modifier"});
+        p.setValue(TableEditor.HEADERS, new String[]{"ID", "Name", "Namespace", "Encode"});
+        p.setValue(TableEditor.OBJECT_PROPERTIES, new String[]{"id", "name", "namespace", "modifier"});
     }
 }
