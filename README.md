@@ -80,13 +80,15 @@ depending on what the endpoint's WSDL defines.
 
 The "Parts to Sign"/"Parts to Encrypt" are empty by default, however, that results in the SOAP Body content to be signed or encrypted.
 
-Suppose the Timestamp element was to be included in the signature or encryption in addition to the Body element, both would have to be listed as follows: 
+Suppose the Timestamp element was to be included in the signature or encryption in addition to the Body element and the Element with ID 1234567, they would have to be listed as follows: 
 
-|Name|Namespace|Encode|
-|----|---------|------|
-|Body|http://schemas.xmlsoap.org/soap/envelope/ | |
-|Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd | |
+|ID|Name|Namespace|Encode|
+|----|----|---------|------|
+| |Body|http://schemas.xmlsoap.org/soap/envelope/ | |
+| |Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd | |
+| 1234567|| | |
 
+If the ID is specified, the Name and Namespace are not necessary and will not be used.  
 *Note that the Timestamp element is not inserted by the Pre-Processor but has to be present in the payload.*
 
 Encode is only relevant for encryption and can be one of the following:
