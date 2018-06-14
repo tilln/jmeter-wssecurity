@@ -12,6 +12,7 @@ The plugin provides
 * [Pre-Processors](http://jmeter.apache.org/usermanual/component_reference.html#preprocessors) 
 for adding digital signature or encryption to a sampler's payload (based on a certificate from a given keystore),
 * a Pre-Processor for adding a Username Token to a sampler's payload,
+* a Pre-Processor for adding a Saml Token to a sampler's payload,
 * a [Post-Processor](http://jmeter.apache.org/usermanual/component_reference.html#postprocessors)
 for decrypting a sampler's response.
 
@@ -36,12 +37,30 @@ Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecu
 	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.1.8/wss4j-ws-security-dom-2.1.8.jar)
 	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/2.1.8/wss4j-ws-security-common-2.1.8.jar)
 	* [org.apache.santuario / xmlsec](https://search.maven.org/remotecontent?filepath=org/apache/santuario/xmlsec/2.0.8/xmlsec-2.0.8.jar)
+	* [org.opensaml / opensaml-core](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-core/3.3.0/opensaml-core-3.3.0.jar)
+	* [org.opensaml / opensaml-messaging-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-messaging-api/3.3.0/opensaml-messaging-api-3.3.0.jar)
+	* [org.opensaml / opensaml-profile-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-profile-api/3.3.0/opensaml-profile-api-3.3.0.jar)
+	* [org.opensaml / opensaml-saml-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-saml-api/3.3.0/opensaml-saml-api-3.3.0.jar)
+	* [org.opensaml / opensaml-saml-impl](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-saml-impl/3.3.0/opensaml-saml-impl-3.3.0.jar)
+	* [org.opensaml / opensaml-security-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-security-api/3.3.0/opensaml-security-api-3.3.0.jar)
+	* [org.opensaml / opensaml-security-impl](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-security-impl/3.3.0/opensaml-security-impl-3.3.0.jar)
+	* [org.opensaml / opensaml-soap-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-soap-api/3.3.0/opensaml-soap-api-3.3.0.jar)
+	* [org.opensaml / opensaml-storage-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-storage-api/3.3.0/opensaml-storage-api-3.3.0.jar)
+	* [org.opensaml / opensaml-xacml-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xacml-api/3.3.0/opensaml-xacml-api-3.3.0.jar)
+	* [org.opensaml / opensaml-xacml-impl](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xacml-impl/3.3.0/opensaml-xacml-impl-3.3.0.jar)
+	* [org.opensaml / opensaml-xacml-saml-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-core/3.3.0/opensaml-xacml-saml-api-3.3.0.jar)
+	* [org.opensaml / opensaml-xacml-saml-impl](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xacml-saml-impl/3.3.0/opensaml-xacml-saml-impl-3.3.0.jar)
+	* [org.opensaml / opensaml-xmlsec-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xmlsec-api/3.3.0/opensaml-xmlsec-api-3.3.0.jar)
+	* [org.opensaml / opensaml-xmlsec-impl](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xmlsec-impl/3.3.0/opensaml-xmlsec-impl-3.3.0.jar)
+	* [com.google.guava / guava](https://search.maven.org/remotecontent?filepath=com/google/guava/guava/19.0/guava-19.0.jar)
+	* [net.shibboleth.utilities / java-support](https://search.maven.org/remotecontent?filepath=net/shibboleth/utilities/java-support/7.3.0/java-support-7.3.0.jar)
+
 3. Restart JMeter.
 
 Usage
 ------------
 
-From the context menu, select "Add" / "Pre Processors" / "SOAP Message Signer", "SOAP Message Encrypter" or "SOAP Message UsernameToken".
+From the context menu, select "Add" / "Pre Processors" / "SOAP Message Signer", "SOAP Message Encrypter" , "SOAP Message Saml" or "SOAP Message UsernameToken".
 
 The message to be signed or encrypted must be a valid SOAP message and must be in one of the following locations:
 * For [HTTP request](http://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request): Tab "Body Data" (not "Parameters")
@@ -61,6 +80,10 @@ Users familiar with SoapUI will find similarities to the [outgoing WS-Security c
 ### SOAP Message Encrypter
 
 ![SOAP Message Encrypter](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/encryption.png)
+
+### SOAP Message Saml
+
+![SOAP Message Saml](https://raw.githubusercontent.com/fpirson/jmeter-wssecurity/master/docs/saml.png)
 
 ### SOAP Message Username Token
 
