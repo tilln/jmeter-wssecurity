@@ -12,6 +12,7 @@ The plugin provides
 * [Pre-Processors](http://jmeter.apache.org/usermanual/component_reference.html#preprocessors) 
 for adding digital signature or encryption to a sampler's payload (based on a certificate from a given keystore),
 * a Pre-Processor for adding a Username Token to a sampler's payload,
+* a Pre-Processor for adding a Timestamp to a sampler's payload,
 * a Pre-Processor for adding a Saml Token to a sampler's payload,
 * a [Post-Processor](http://jmeter.apache.org/usermanual/component_reference.html#postprocessors)
 for decrypting a sampler's response.
@@ -105,12 +106,29 @@ The "Parts to Sign"/"Parts to Encrypt" are empty by default, however, that resul
 
 Suppose the Timestamp element was to be included in the signature or encryption in addition to the Body element, both would have to be listed as follows: 
 
-|Name|Namespace|Encode|
-|----|---------|------|
-|Body|http://schemas.xmlsoap.org/soap/envelope/ | |
-|Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd | |
+|ID|Name|Namespace|Encode|
+|--|----|---------|------|
+|  |Body|http://schemas.xmlsoap.org/soap/envelope/ | |
+|  |Timestamp|http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd | |
 
-*Note that the Timestamp element is not inserted by the Pre-Processor but has to be present in the payload.*
+If there are multiple XML elements with the same name and namespace, the element's ID attribute can be used to determine which element is to be signed/encrypted.
+If the ID is specified, the Name and Namespace are not necessary and will not be used.  
+
+Example:
+
+```xml
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <element ID="e1">this should be encrypted</element>
+        <element ID="e2">this is not to be encrypted</element>
+        <element>another one</element>
+	</soap:Body>
+</soap:Envelope>
+```
+
+|ID|Name|Namespace|Encode|
+|--|----|---------|------|
+|e1|    |         |      |
 
 Encode is only relevant for encryption and can be one of the following:
 * "Element" (default): The entire XML element is encrypted.
