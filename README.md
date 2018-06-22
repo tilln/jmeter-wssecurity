@@ -49,12 +49,13 @@ Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecu
 	* [org.opensaml / opensaml-storage-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-storage-api/3.3.0/opensaml-storage-api-3.3.0.jar)
 	* [org.opensaml / opensaml-xacml-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xacml-api/3.3.0/opensaml-xacml-api-3.3.0.jar)
 	* [org.opensaml / opensaml-xacml-impl](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xacml-impl/3.3.0/opensaml-xacml-impl-3.3.0.jar)
-	* [org.opensaml / opensaml-xacml-saml-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-core/3.3.0/opensaml-xacml-saml-api-3.3.0.jar)
+	* [org.opensaml / opensaml-xacml-saml-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xacml-saml-api/3.3.0/opensaml-xacml-saml-api-3.3.0.jar)
 	* [org.opensaml / opensaml-xacml-saml-impl](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xacml-saml-impl/3.3.0/opensaml-xacml-saml-impl-3.3.0.jar)
 	* [org.opensaml / opensaml-xmlsec-api](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xmlsec-api/3.3.0/opensaml-xmlsec-api-3.3.0.jar)
 	* [org.opensaml / opensaml-xmlsec-impl](https://search.maven.org/remotecontent?filepath=org/opensaml/opensaml-xmlsec-impl/3.3.0/opensaml-xmlsec-impl-3.3.0.jar)
 	* [com.google.guava / guava](https://search.maven.org/remotecontent?filepath=com/google/guava/guava/19.0/guava-19.0.jar)
 	* [net.shibboleth.utilities / java-support](https://search.maven.org/remotecontent?filepath=net/shibboleth/utilities/java-support/7.3.0/java-support-7.3.0.jar)
+        * [joda-time / joda-time](https://search.maven.org/remotecontent?filepath=joda-time/joda-time/2.1/joda-time-2.1.jar)
 
 3. Restart JMeter.
 
