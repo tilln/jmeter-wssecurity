@@ -17,6 +17,7 @@ public class WSSTimestampPreProcessor extends AbstractWSSecurityPreProcessor {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     private int timeToLive;
+    private boolean precisionInMilliSeconds = true;
 
     public WSSTimestampPreProcessor() throws ParserConfigurationException {
         super();
@@ -28,6 +29,7 @@ public class WSSTimestampPreProcessor extends AbstractWSSecurityPreProcessor {
         WSSecTimestamp secBuilder = new WSSecTimestamp(); // as of wss4j v2.2: WSSecTimestamp(secHeader);
 
         secBuilder.setTimeToLive(getTimeToLive());
+        secBuilder.setPrecisionInMilliSeconds(isPrecisionInMilliSeconds());
 
         log.debug("Building WSSecTimestamp");
         return secBuilder.build(document, secHeader); // as of wss4j v2.2: build();
@@ -40,4 +42,12 @@ public class WSSTimestampPreProcessor extends AbstractWSSecurityPreProcessor {
     public void setTimeToLive(int timeToLive) {
         this.timeToLive = timeToLive;
     }
+
+    public boolean isPrecisionInMilliSeconds() {
+		return precisionInMilliSeconds;
+	}
+
+	public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
+		this.precisionInMilliSeconds = precisionInMilliSeconds;
+	}
 }
