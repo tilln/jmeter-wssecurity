@@ -1,6 +1,9 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecBase;
@@ -12,7 +15,10 @@ public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
 
     private static final long serialVersionUID = 1L;
 
-    transient private WSSecEncrypt secBuilder;
+    private static final Logger log = LoggingManager.getLoggerForClass();
+
+    private String symmetricEncryptionAlgorithm, keyEncryptionAlgorithm;
+    private boolean createEncryptedKey;
 
     /* Currently supported attributes are listed below.
      * The first value for each will be displayed in the GUI as default.
@@ -44,55 +50,59 @@ public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
     }
 
     @Override
-    protected void initSecBuilder() {
-        secBuilder = new WSSecEncrypt();
-    }
-
-    @Override
-    protected WSSecBase getSecBuilder() {
-        return secBuilder;
-    }
-
-    @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
-        return secBuilder.build(document, getCrypto(), secHeader);
+        log.debug("Initializing WSSecEncrypt");
+        WSSecEncrypt secBuilder = new WSSecEncrypt(); // as of wss4j v2.2: WSSecEncrypt(secHeader);
+
+        secBuilder.setUserInfo(getCertAlias(), getCertPassword());
+        setKeyIdentifier(secBuilder);
+        setPartsToSecure(secBuilder);
+        secBuilder.setSymmetricEncAlgorithm(getSymmetricEncryptionAlgorithm());
+        secBuilder.setKeyEncAlgo(getKeyEncryptionAlgorithm());
+        secBuilder.setEncryptSymmKey(isCreateEncryptedKey());
+
+        log.debug("Building WSSecEncrypt");
+        return secBuilder.build(document, getCrypto(), secHeader); // as of wss4j v2.2: build(getCrypto());
     }
 
     // Accessors
     public String getSymmetricEncryptionAlgorithm() {
-        return secBuilder.getSymmetricEncAlgorithm();
+        return symmetricEncryptionAlgorithm;
     }
 
-    public void setSymmetricEncryptionAlgorithm(String algorithm) {
-        secBuilder.setSymmetricEncAlgorithm(algorithm);
+    public void setSymmetricEncryptionAlgorithm(String symmetricEncryptionAlgorithm) {
+        this.symmetricEncryptionAlgorithm = symmetricEncryptionAlgorithm;
     }
 
     public String getKeyEncryptionAlgorithm() {
-        return secBuilder.getKeyEncAlgo();
+        return keyEncryptionAlgorithm;
     }
 
-    public void setKeyEncryptionAlgorithm(String algorithm) {
-        secBuilder.setKeyEncAlgo(algorithm);
+    public void setKeyEncryptionAlgorithm(String keyEncryptionAlgorithm) {
+        this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
     }
 
-    public boolean getCreateEncryptedKey() {
-        return secBuilder.isEncryptSymmKey();
+    public boolean isCreateEncryptedKey() {
+        return createEncryptedKey;
     }
 
     public void setCreateEncryptedKey(boolean createEncryptedKey) {
-        secBuilder.setEncryptSymmKey(createEncryptedKey);
+        this.createEncryptedKey = createEncryptedKey;
     }
 
-    /* This getter/setter pair seems to be required for the bean introspector when building the GUI,
-     * otherwise the parent class property will be overwritten when building child class GUIs.
-     */
-    @Override
     public String getKeyIdentifier() {
-        return super.getKeyIdentifier();
+        return keyIdentifier;
     }
 
-    @Override
     public void setKeyIdentifier(String keyIdentifier) {
-        super.setKeyIdentifier(keyIdentifier);
+        this.keyIdentifier = keyIdentifier;
+    }
+
+    public List<SecurityPart> getPartsToSecure() {
+        return partsToSecure;
+    }
+
+    public void setPartsToSecure(List<SecurityPart> partsToSecure) {
+        this.partsToSecure = partsToSecure;
     }
 }

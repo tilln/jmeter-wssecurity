@@ -13,17 +13,14 @@ import org.w3c.dom.Document;
 
 /**
  * Abstract base class for any preprocessor that creates/modifies a SOAP WSS header in the sampler payload.
- * Subclasses need to provide an actual wss4j WSSecBase instance and implement some wrapper methods.
+ * Subclasses need to implement a build method that creates the actual header element.
  */
 public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElement implements PreProcessor, TestBean { 
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
-    private String username, password;
-
     public AbstractWSSecurityPreProcessor() throws ParserConfigurationException {
         super();
-        initSecBuilder();
     }
 
     protected Sampler getSampler() {
@@ -40,13 +37,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElem
         SamplerPayloadAccessor.setPayload(getSampler(), payload);
     }
 
-    /* Subclasses are to instantiate and initialize an appropriate instance.
-     */
-    protected abstract WSSecBase getSecBuilder();
-    protected abstract void initSecBuilder();
-
-    /* Subclasses are to implement the actual creation of the signature or encryption,
-     * as WSSecBase does not define a build method.
+    /* Subclasses are to implement the actual creation of the signature or encryption.
      */
     protected abstract Document build(Document document, WSSecHeader secHeader)
         throws WSSecurityException;
@@ -66,7 +57,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElem
 
             log.debug("Initializing WSS header");
             WSSecHeader secHeader = new WSSecHeader(doc);
-            secHeader.insertSecurityHeader();
+            secHeader.insertSecurityHeader(); // Create header unless one exists
 
             log.debug("Building WSS header");
             doc = this.build(doc, secHeader); // Delegate in abstract method
@@ -76,30 +67,5 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElem
         catch (Exception e) {
             log.error("Processing failed! ", e);
         }
-        /* There is no cleanup method in the wss4j API, so we have to discard the old instance
-         * and create a fresh one during the next iteration.
-         * To do that at the beginning of PreProcessor.process() would be too late as the Bean properties are (re)applied
-         * immediately before, and passed through to the secBuilder instance.
-         * (@see https://github.com/apache/jmeter/blob/v3_1/src/core/org/apache/jmeter/threads/JMeterThread.java#L787)
-         * Therefore the only way to do this is *after* the instance is used.
-         */
-        initSecBuilder();
-    }
-
-    // Accessors (protected for subclasses to use but hidden from bean introspector, or they would show on subclass GUIs) 
-    protected String getUsername() {
-        return username;
-    }
-
-    protected void setUsername(String username) {
-        getSecBuilder().setUserInfo(this.username = username, password);
-    }
-
-    protected String getPassword() {
-        return password;
-    }
-
-    protected void setPassword(String password) {
-        getSecBuilder().setUserInfo(username, this.password = password);
     }
 }

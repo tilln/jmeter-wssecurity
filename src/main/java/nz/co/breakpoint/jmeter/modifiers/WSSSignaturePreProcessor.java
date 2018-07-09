@@ -1,6 +1,9 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecBase;
@@ -14,7 +17,10 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
 
     private static final long serialVersionUID = 1L;
 
-    transient private WSSecSignature secBuilder;
+    private static final Logger log = LoggingManager.getLoggerForClass();
+
+    private String signatureAlgorithm, signatureCanonicalization, digestAlgorithm;
+    private boolean useSingleCertificate;
 
     /* Currently supported attributes are listed below.
      * The first value for each will be displayed in the GUI as default.
@@ -53,63 +59,68 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
     }
 
     @Override
-    protected void initSecBuilder() {
-        secBuilder = new WSSecSignature();
-    }
-
-    @Override
-    protected WSSecBase getSecBuilder() {
-        return secBuilder;
-    }
-
-    @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
-        return secBuilder.build(document, getCrypto(), secHeader);
+        log.debug("Initializing WSSecSignature");
+        WSSecSignature secBuilder = new WSSecSignature(); // as of wss4j v2.2: WSSecSignature(secHeader);
+
+        secBuilder.setUserInfo(getCertAlias(), getCertPassword());
+        setKeyIdentifier(secBuilder);
+        setPartsToSecure(secBuilder);
+        secBuilder.setSignatureAlgorithm(getSignatureAlgorithm());
+        secBuilder.setSigCanonicalization(getSignatureCanonicalization());
+        secBuilder.setDigestAlgo(getDigestAlgorithm());
+        secBuilder.setUseSingleCertificate(isUseSingleCertificate());
+
+        log.debug("Building WSSecSignature");
+        return secBuilder.build(document, getCrypto(), secHeader); // as of wss4j v2.2: build(getCrypto());
     }
 
     // Accessors
     public String getSignatureAlgorithm() {
-        return secBuilder.getSignatureAlgorithm();
+        return signatureAlgorithm;
     }
 
     public void setSignatureAlgorithm(String signatureAlgorithm) {
-        secBuilder.setSignatureAlgorithm(signatureAlgorithm);
+        this.signatureAlgorithm = signatureAlgorithm;
     }
 
     public String getSignatureCanonicalization() {
-        return secBuilder.getSigCanonicalization();
+        return signatureCanonicalization;
     }
 
     public void setSignatureCanonicalization(String signatureCanonicalization) {
-        secBuilder.setSigCanonicalization(signatureCanonicalization);
+        this.signatureCanonicalization = signatureCanonicalization;
     }
 
     public String getDigestAlgorithm() {
-        return secBuilder.getDigestAlgo();
+        return digestAlgorithm;
     }
 
     public void setDigestAlgorithm(String digestAlgorithm) {
-        secBuilder.setDigestAlgo(digestAlgorithm);
+        this.digestAlgorithm = digestAlgorithm;
     }
 
-    public boolean getUseSingleCertificate() {
-        return secBuilder.isUseSingleCertificate();
+    public boolean isUseSingleCertificate() {
+        return useSingleCertificate;
     }
 
     public void setUseSingleCertificate(boolean useSingleCertificate) {
-        secBuilder.setUseSingleCertificate(useSingleCertificate);
+        this.useSingleCertificate = useSingleCertificate;
     }
 
-    /* This getter/setter pair seems to be required for the bean introspector when building the GUI,
-     * otherwise the parent class property will be overwritten when building child class GUIs.
-     */
-    @Override
     public String getKeyIdentifier() {
-        return super.getKeyIdentifier();
+        return keyIdentifier;
     }
 
-    @Override
     public void setKeyIdentifier(String keyIdentifier) {
-        super.setKeyIdentifier(keyIdentifier);
+        this.keyIdentifier = keyIdentifier;
+    }
+
+    public List<SecurityPart> getPartsToSecure() {
+        return partsToSecure;
+    }
+
+    public void setPartsToSecure(List<SecurityPart> partsToSecure) {
+        this.partsToSecure = partsToSecure;
     }
 }

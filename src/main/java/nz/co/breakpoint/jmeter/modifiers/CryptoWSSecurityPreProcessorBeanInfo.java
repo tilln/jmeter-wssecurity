@@ -7,8 +7,6 @@ import org.apache.jmeter.testbeans.gui.PasswordEditor;
 
 public class CryptoWSSecurityPreProcessorBeanInfo extends AbstractWSSecurityPreProcessorBeanInfo {
 
-    protected final static String PARTSTOSECURE = "partsToSecure";
-
     public CryptoWSSecurityPreProcessorBeanInfo(Class<? extends CryptoWSSecurityPreProcessor> clazz) {
         super(clazz);
 
@@ -35,11 +33,15 @@ public class CryptoWSSecurityPreProcessorBeanInfo extends AbstractWSSecurityPreP
         p.setPropertyEditorClass(PasswordEditor.class);
         p.setValue(NOT_UNDEFINED, Boolean.TRUE);
         p.setValue(DEFAULT, "");
+    }
 
-        p = property(PARTSTOSECURE); // this is expected to be added to a property group by subclasses
+    // This may be added to a property group by subclasses (if desired)
+    protected PropertyDescriptor createPartsToSecureProperty() {
+        PropertyDescriptor p = property("partsToSecure");
         p.setPropertyEditorClass(TableEditor.class);
         p.setValue(TableEditor.CLASSNAME, SecurityPart.class.getName());
         p.setValue(TableEditor.HEADERS, new String[]{"ID", "Name", "Namespace", "Encode"});
         p.setValue(TableEditor.OBJECT_PROPERTIES, new String[]{"id", "name", "namespace", "modifier"});
+        return p;
     }
 }

@@ -12,9 +12,9 @@ import org.w3c.dom.Document;
 
 public class WSSTimestampPreProcessor extends AbstractWSSecurityPreProcessor {
 
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final long serialVersionUID = 1;
 
-    transient private WSSecTimestamp secBuilder;
+    private static final Logger log = LoggingManager.getLoggerForClass();
 
     private int timeToLive;
 
@@ -22,23 +22,15 @@ public class WSSTimestampPreProcessor extends AbstractWSSecurityPreProcessor {
         super();
     }
 
-    private static final long serialVersionUID = -4390837640018590558L;
-
-    @Override
-    protected WSSecBase getSecBuilder() {
-        return secBuilder;
-    }
-
-    @Override
-    protected void initSecBuilder() {
-        secBuilder = new WSSecTimestamp();
-    }
-
     @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
-        secBuilder.setTimeToLive(timeToLive);
-        log.debug("Time to live: " + timeToLive);
-        return secBuilder.build(document, secHeader);
+        log.debug("Initializing WSSecTimestamp");
+        WSSecTimestamp secBuilder = new WSSecTimestamp(); // as of wss4j v2.2: WSSecTimestamp(secHeader);
+
+        secBuilder.setTimeToLive(getTimeToLive());
+
+        log.debug("Building WSSecTimestamp");
+        return secBuilder.build(document, secHeader); // as of wss4j v2.2: build();
     }
 
     public int getTimeToLive() {

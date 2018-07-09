@@ -20,15 +20,6 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
     }
 
     @Test
-    public void testDefaultSignature() throws Exception {
-        HTTPSamplerBase sampler = createHTTPSampler();
-        context.setCurrentSampler(sampler);
-        mod.process();
-        String signedContent = SamplerPayloadAccessor.getPayload(sampler);
-        assertThat(signedContent, containsString("\"http://www.w3.org/2000/09/xmldsig#\""));
-    }
-
-    @Test
     public void testAllSignatureCombinations() throws Exception {
         for (String ki : WSSSignaturePreProcessor.keyIdentifiers) {
             for (String sc : WSSSignaturePreProcessor.signatureCanonicalizations) {

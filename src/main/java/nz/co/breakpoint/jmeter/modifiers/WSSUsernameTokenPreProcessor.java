@@ -18,80 +18,84 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
-    transient private WSSecUsernameToken secBuilder;
-    
+    private String username;
+    private String password;
     private String passwordType;
     private boolean addNonce;
     private boolean addCreated;
     private boolean precisionInMilliSeconds;
 
-    static final Map<String, String> passwordTypeMap = new HashMap<String, String>();
-    static {
-        passwordTypeMap.put("Password Digest", WSConstants.PASSWORD_DIGEST);
-        passwordTypeMap.put("Password Text",   WSConstants.PASSWORD_TEXT);
-        passwordTypeMap.put("No Password",     null); // wss4j does not seem to use WSConstants.PW_NONE
-    }
-
     /* Currently supported attributes are listed below.
      * The first value for each will be displayed in the GUI as default.
+     * TODO localization
      */
     static final String[] passwordTypes = new String[]{
-        getPasswordTypeLabelForType(WSConstants.PASSWORD_DIGEST),
-        getPasswordTypeLabelForType(WSConstants.PASSWORD_TEXT),
-        getPasswordTypeLabelForType(null)
+        "Password Digest",
+        "Password Text",
+        "No Password",
     };
+
+    static final Map<String, String> passwordTypeMap = new HashMap<String, String>();
+    static {
+        passwordTypeMap.put(passwordTypes[0], WSConstants.PASSWORD_DIGEST);
+        passwordTypeMap.put(passwordTypes[1], WSConstants.PASSWORD_TEXT);
+        passwordTypeMap.put(passwordTypes[2], null); // wss4j does not seem to use WSConstants.PW_NONE
+    }
 
     public WSSUsernameTokenPreProcessor() throws ParserConfigurationException {
         super();
     }
 
-    /* Reverse lookup for above passwordTypeMap. Mainly used for populating the GUI dropdown.
-     */
-    protected static String getPasswordTypeLabelForType(String passwordType) {
-        for (Map.Entry<String, String> id : passwordTypeMap.entrySet()) {
-            if (passwordType != null && passwordType.equals(id.getValue())
-                || passwordType == null && passwordType == id.getValue())
-                return id.getKey();
-        }
-        return null;
-    }
-
-    @Override
-    protected void initSecBuilder() {
-        secBuilder = new WSSecUsernameToken();
-    }
-
-    @Override
-    protected WSSecBase getSecBuilder() {
-        return secBuilder;
-    }
-
     @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
-        if (addNonce) secBuilder.addNonce();
-        if (addCreated) secBuilder.addCreated();
-        secBuilder.setPrecisionInMilliSeconds(precisionInMilliSeconds);
-        if (passwordType == null) {
+        log.debug("Initializing WSSecUsernameToken");
+        WSSecUsernameToken secBuilder = new WSSecUsernameToken(); // as of wss4j v2.2: WSSecUsernameToken(secHeader);
+
+        secBuilder.setUserInfo(getUsername(), getPassword());
+        if (isAddNonce()) secBuilder.addNonce();
+        if (isAddCreated()) secBuilder.addCreated();
+        secBuilder.setPrecisionInMilliSeconds(isPrecisionInMilliSeconds());
+        secBuilder.setPasswordType(passwordTypeMap.get(getPasswordType()));
+
+        if ("No Password".equals(getPasswordType())) {
             /* An empty password GUI field will result in an empty password string "", regardless of password type.
              * This would cause a NPE in org.apache.wss4j.dom.message.token.UsernameToken.setPassword("") 
+             * (https://github.com/apache/wss4j/blob/wss4j-2.1.8/ws-security-dom/src/main/java/org/apache/wss4j/dom/message/token/UsernameToken.java#L534)
              * when trying to retrieve the password element that is not there (as per password type).
              * Therefore it needs to be set to null explicitly.
              */
-            setPassword(null);
+            secBuilder.setUserInfo(getUsername(), null);
         }
-        return secBuilder.build(document, secHeader);
+        log.debug("Building WSSecUsernameToken");
+        return secBuilder.build(document, secHeader); // as of wss4j v2.2: build();
     }
 
     // Accessors
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getPasswordType() {
-        return getPasswordTypeLabelForType(passwordType);
+        return passwordType;
     }
 
     public void setPasswordType(String passwordType) {
-        secBuilder.setPasswordType(this.passwordType = passwordTypeMap.get(passwordType));
+        this.passwordType = passwordType;
     }
 
-    public boolean getAddNonce() {
+    public boolean isAddNonce() {
         return addNonce;
     }
 
@@ -99,7 +103,7 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
         this.addNonce = addNonce;
     }
 
-    public boolean getAddCreated() {
+    public boolean isAddCreated() {
         return addCreated;
     }
 
@@ -114,21 +118,4 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
 	public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
 		this.precisionInMilliSeconds = precisionInMilliSeconds;
 	}
-
-	// Make accessors public for bean introspector to build the GUI.
-    public String getUsername() {
-        return super.getUsername();
-    }
-
-    public void setUsername(String username) {
-        super.setUsername(username);
-    }
-
-    public String getPassword() {
-        return super.getPassword();
-    }
-
-    public void setPassword(String password) {
-        super.setPassword(password);
-    }
 }

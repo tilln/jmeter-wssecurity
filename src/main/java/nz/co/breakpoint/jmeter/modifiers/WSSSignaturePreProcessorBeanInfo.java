@@ -9,7 +9,7 @@ public class WSSSignaturePreProcessorBeanInfo extends CryptoWSSecurityPreProcess
 
         createPropertyGroup("Signature", new String[]{ 
             "keyIdentifier", "signatureAlgorithm", "signatureCanonicalization", "digestAlgorithm", "useSingleCertificate",
-            PARTSTOSECURE // this property is created in the parent class but added here so it is rendered at the bottom
+            createPartsToSecureProperty().getName()
         });
         PropertyDescriptor p;
 

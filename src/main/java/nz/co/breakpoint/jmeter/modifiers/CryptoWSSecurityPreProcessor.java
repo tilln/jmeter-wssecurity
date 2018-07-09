@@ -11,6 +11,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.WSSecBase;
 
 import static org.apache.wss4j.common.crypto.Merlin.PREFIX;
 import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_FILE;
@@ -25,7 +26,8 @@ public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPre
 
     private final Properties cryptoProps = new Properties(); // Holds configured attributes for crypto instance
 
-    private List<SecurityPart> partsToSecure; // Holds the names of XML elements to secure (e.g. SOAP Body)
+    protected List<SecurityPart> partsToSecure; // Holds the names of XML elements to secure (e.g. SOAP Body)
+    protected String certAlias, certPassword, keyIdentifier;
 
     static final Map<String, Integer> keyIdentifierMap = new HashMap<String, Integer>();
     static {
@@ -62,19 +64,19 @@ public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPre
 
     // Accessors
     public String getCertAlias() {
-        return getUsername();
+        return certAlias;
     }
 
     public void setCertAlias(String certAlias) {
-        setUsername(certAlias);
+        this.certAlias = certAlias;
     }
 
     public String getCertPassword() {
-        return getPassword();
+        return certPassword;
     }
 
     public void setCertPassword(String certPassword) {
-        setPassword(certPassword);
+        this.certPassword = certPassword;
     }
 
     public String getKeystoreFile() {
@@ -93,23 +95,15 @@ public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPre
         cryptoProps.setProperty(PREFIX+KEYSTORE_PASSWORD, keystorePassword);
     }
 
-    public String getKeyIdentifier() {
-        return getKeyIdentifierLabelForType(getSecBuilder().getKeyIdentifierType());
+    protected void setKeyIdentifier(WSSecBase secBuilder) {
+        secBuilder.setKeyIdentifierType(keyIdentifierMap.get(keyIdentifier));
     }
 
-    public void setKeyIdentifier(String keyIdentifier) {
-        getSecBuilder().setKeyIdentifierType(keyIdentifierMap.get(keyIdentifier));
-    }
-
-    public List<SecurityPart> getPartsToSecure() {
-        return partsToSecure;
-    }
-
-    public void setPartsToSecure(List<SecurityPart> partsToSecure) {
-        this.partsToSecure = partsToSecure;
-        getSecBuilder().getParts().clear();
+    protected void setPartsToSecure(WSSecBase secBuilder) {
+        secBuilder.getParts().clear();
+        if (partsToSecure == null) return;
         for (SecurityPart part : partsToSecure) {
-            getSecBuilder().getParts().add(part.getPart());
+            secBuilder.getParts().add(part.getPart());
         }
     }
 }

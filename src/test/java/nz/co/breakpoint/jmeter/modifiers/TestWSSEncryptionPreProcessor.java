@@ -20,15 +20,6 @@ public class TestWSSEncryptionPreProcessor extends TestWSSSecurityPreProcessorBa
     }
 
     @Test
-    public void testDefaultEncryption() throws Exception {
-        HTTPSamplerBase sampler = createHTTPSampler();
-        context.setCurrentSampler(sampler);
-        mod.process();
-        String encryptedContent = SamplerPayloadAccessor.getPayload(sampler);
-        assertThat(encryptedContent, containsString("Type=\"http://www.w3.org/2001/04/xmlenc#Content\""));
-    }
-
-    @Test
     public void testAllEncryptionCombinations() throws Exception {
         for (String ki : WSSEncryptionPreProcessor.keyIdentifiers) {
             for (String ke : WSSEncryptionPreProcessor.keyEncryptionAlgorithms) {

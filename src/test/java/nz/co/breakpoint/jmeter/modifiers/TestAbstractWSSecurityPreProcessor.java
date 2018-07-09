@@ -22,17 +22,8 @@ public class TestAbstractWSSecurityPreProcessor extends TestWSSSecurityPreProces
         }
 
         @Override
-        protected WSSecBase getSecBuilder() {
-            return null;
-        }
-
-        @Override
-        protected void initSecBuilder() {
-            // no-op implementation for testing
-        }
-
-        @Override
         protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
+            // no-op implementation for testing
             return document;
         }
     }
