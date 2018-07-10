@@ -19,6 +19,9 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElem
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
+    private String actor;
+    private boolean mustUnderstand;
+
     public AbstractWSSecurityPreProcessor() throws ParserConfigurationException {
         super();
     }
@@ -56,7 +59,7 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElem
             Document doc = stringToDocument(xml);
 
             log.debug("Initializing WSS header");
-            WSSecHeader secHeader = new WSSecHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(getActor(), isMustUnderstand(), doc);
             secHeader.insertSecurityHeader(); // Create header unless one exists
 
             log.debug("Building WSS header");
@@ -67,5 +70,22 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElem
         catch (Exception e) {
             log.error("Processing failed! ", e);
         }
+    }
+
+    // Accessors
+    public String getActor() {
+        return actor;
+    }
+
+    public void setActor(String actor) {
+        this.actor = actor;
+    }
+
+    public boolean isMustUnderstand() {
+        return mustUnderstand;
+    }
+
+    public void setMustUnderstand(boolean mustUnderstand) {
+        this.mustUnderstand = mustUnderstand;
     }
 }
