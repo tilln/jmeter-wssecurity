@@ -6,8 +6,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.apache.jmeter.assertions.AssertionResult;
@@ -16,20 +14,15 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
-public class TestWSSDecryptionPostProcessor {
+public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorBase {
     private WSSDecryptionPostProcessor mod = null;
-    private JMeterContext context = null;
     private SampleResult result = null;
 
-    @BeforeClass
-    public static void setUpClass() throws IOException {
-        File propsFile = File.createTempFile("jmeter-wssecurity-test-", ".properties");
-        propsFile.deleteOnExit();
-        JMeterUtils.loadJMeterProperties(propsFile.getAbsolutePath());
-    }
+    @ClassRule
+    public static final JMeterPropertiesResource props = new JMeterPropertiesResource();
 
     @Before
     public void setUp() throws Exception {
@@ -87,9 +80,22 @@ public class TestWSSDecryptionPostProcessor {
         JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, "true");
         result.setResponseData("<dummy />", "UTF-8");
         context.setPreviousResult(result);
+
         mod.process();
+
         assertTrue(result.isSuccessful());
         AssertionResult[] assertionResults = result.getAssertionResults();
         assertEquals(0, assertionResults.length);
+    }
+
+    @Test
+    public void testSignatureValidation() throws Exception {
+        result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/signed-body.xml")));
+        context.setPreviousResult(result);
+
+        mod.process();
+
+        assertTrue(result.isSuccessful());
+        assertEquals(0, result.getAssertionResults().length);
     }
 }

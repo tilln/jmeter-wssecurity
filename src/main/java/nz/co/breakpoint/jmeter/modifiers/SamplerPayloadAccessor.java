@@ -18,6 +18,8 @@ import org.apache.log.Logger;
  * "jmeter.wssecurity.samplerPayloadAccessors" in the format
  * <className>.<propertyName>
  * Several of those may be comma separated.
+ * Using reflection and calling a method seems a more flexible approach than assuming that
+ * a sampler stores the payload in a JMeter property (such as JMSSampler's "HTTPSamper.xml_data").
  */
 public class SamplerPayloadAccessor {
 
@@ -32,7 +34,10 @@ public class SamplerPayloadAccessor {
      * This will be iterated until a the first class is found that the sampler is or is a subclass of.
      */
     protected static final Map<Class<?>, PropertyDescriptor> samplerPayloadAccessors = new HashMap<Class<?>, PropertyDescriptor>();
-    static {
+    static { parseProperties(); }
+
+    // package access for unit tests
+    static void parseProperties() {
         String accessors = ("org.apache.jmeter.protocol.jms.sampler.JMSSampler.content" + DELIMITER +
             "org.apache.jmeter.protocol.jms.sampler.PublisherSampler.textMessage" + DELIMITER +
             JMeterUtils.getPropDefault(ACCESSORS_PROPERTY_NAME, ""))
@@ -44,6 +49,7 @@ public class SamplerPayloadAccessor {
             String className = classAndAccessor.substring(0, lastDot);
             String propertyName = classAndAccessor.substring(lastDot+1);
             
+            log.debug("Registering accessor property for "+className+": "+propertyName);
             try {
                 Class<?> clazz = Class.forName(className, false, SamplerPayloadAccessor.class.getClassLoader()); // load class without initialisation
                 samplerPayloadAccessors.put(clazz, new PropertyDescriptor(propertyName, clazz));
