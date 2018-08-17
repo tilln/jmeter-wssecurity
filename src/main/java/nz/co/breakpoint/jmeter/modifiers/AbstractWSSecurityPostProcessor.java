@@ -15,7 +15,7 @@ import org.w3c.dom.Document;
  * Abstract base class for any postprocessor that validates/decrypts a SOAP WSS header in the sampler response.
  * Subclasses need to provide an actual wss4j WSSecBase instance and implement a build wrapper method.
  */
-public abstract class AbstractWSSecurityPostProcessor extends AbstractXMLTestElement implements PostProcessor, TestBean { 
+public abstract class AbstractWSSecurityPostProcessor extends AbstractWSSecurityTestElement implements PostProcessor, TestBean {
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
@@ -35,7 +35,7 @@ public abstract class AbstractWSSecurityPostProcessor extends AbstractXMLTestEle
      */
     @Override
     public void process() {
-        SampleResult prev = getThreadContext().getPreviousResult();
+        SampleResult prev = getResult();
         if (prev == null) return;
 
         String xml = prev.getResponseDataAsString();

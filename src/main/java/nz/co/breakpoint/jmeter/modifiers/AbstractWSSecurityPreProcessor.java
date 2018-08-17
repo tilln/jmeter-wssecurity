@@ -15,7 +15,7 @@ import org.w3c.dom.Document;
  * Abstract base class for any preprocessor that creates/modifies a SOAP WSS header in the sampler payload.
  * Subclasses need to implement a build method that creates the actual header element.
  */
-public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElement implements PreProcessor, TestBean { 
+public abstract class AbstractWSSecurityPreProcessor extends AbstractWSSecurityTestElement implements PreProcessor, TestBean {
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
@@ -24,10 +24,6 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractXMLTestElem
 
     public AbstractWSSecurityPreProcessor() throws ParserConfigurationException {
         super();
-    }
-
-    protected Sampler getSampler() {
-        return getThreadContext().getCurrentSampler();
     }
 
     protected String getSamplerPayload() {
