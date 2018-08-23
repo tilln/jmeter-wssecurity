@@ -1,76 +1,33 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
-/* The JMeter API lacks an interface for samplers that have a content or payload,
- * so we have to use class specific methods.
- * To make this work for third-party samplers, a String getter/setter pair has to be provided.
- * The Sampler class name and Bean property name can then be provided via the JMeter property 
- * "jmeter.wssecurity.samplerPayloadAccessors" in the format
- * <className>.<propertyName>
- * Several of those may be comma separated.
- * Using reflection and calling a method seems a more flexible approach than assuming that
- * a sampler stores the payload in a JMeter property (such as JMSSampler's "HTTPSamper.xml_data").
+/* The JMeter API lacks an interface for samplers that have a content or payload.
+ * Instead, such samplers may have a JMeter property or getter/setter pair 
+ * that exposes the payload. To access this for 3rd party samplers, the class
+ * and property name can be configured via the JMeter property:
+ * "jmeter.wssecurity.samplerPayloadAccessors"
  */
 public class SamplerPayloadAccessor {
 
     private static final Logger log = LoggingManager.getLoggerForClass();
     
-    static final String ACCESSORS_PROPERTY_NAME = "jmeter.wssecurity.samplerPayloadAccessors";
-    
-    private static final String DELIMITER = ",";
-    
-    /* Collection of Class/Accessor pairs (rather than a lookup map) that stores all known sampler classes 
-     * that have a payload as well as their accessor (bean property).
-     * This will be iterated until a the first class is found that the sampler is or is a subclass of.
-     */
-    protected static final Map<Class<?>, PropertyDescriptor> samplerPayloadAccessors = new HashMap<Class<?>, PropertyDescriptor>();
-    static { parseProperties(); }
+    public static final String ACCESSORS_CONFIG_PROPERTY = "jmeter.wssecurity.samplerPayloadAccessors";
 
-    // package access for unit tests
-    static void parseProperties() {
-        String accessors = ("org.apache.jmeter.protocol.jms.sampler.JMSSampler.content" + DELIMITER +
-            "org.apache.jmeter.protocol.jms.sampler.PublisherSampler.textMessage" + DELIMITER +
-            JMeterUtils.getPropDefault(ACCESSORS_PROPERTY_NAME, ""))
-            .trim().replaceFirst(DELIMITER+"$", ""); // remove whitespaces and trailing delimiter
-        
-        for (String classAndAccessor : accessors.split(DELIMITER)) {
-            int lastDot = classAndAccessor.lastIndexOf('.');
-            
-            String className = classAndAccessor.substring(0, lastDot);
-            String propertyName = classAndAccessor.substring(lastDot+1);
-            
-            log.debug("Registering accessor property for "+className+": "+propertyName);
-            try {
-                Class<?> clazz = Class.forName(className, false, SamplerPayloadAccessor.class.getClassLoader()); // load class without initialisation
-                samplerPayloadAccessors.put(clazz, new PropertyDescriptor(propertyName, clazz));
-            }
-            catch (ClassNotFoundException e) {
-                log.error("Sampler class not found ("+className+")");
-            }
-            catch (IntrospectionException e) {
-                log.error("Sampler payload accessor not found ("+propertyName+")");
-            }
-        }
-    }
-    
-    protected static PropertyDescriptor findSamplerPayloadAccessor(Sampler sampler) {
-        for (Map.Entry<Class<?>, PropertyDescriptor> classAndProperty : samplerPayloadAccessors.entrySet()) {
-            if (classAndProperty.getKey().isAssignableFrom(sampler.getClass())) {
-                return classAndProperty.getValue();
-            }
-        }
-        log.warn("Cannot find sampler payload accessor for "+sampler.getName());
-        return null;
+    private static PropertyAccessor accessor = new PropertyAccessor(
+        JMeterUtils.getPropDefault(ACCESSORS_CONFIG_PROPERTY, "") + PropertyAccessor.DELIMITER +
+        "org.apache.jmeter.protocol.jms.sampler.JMSSampler.\"HTTPSamper.xml_data\"" + PropertyAccessor.DELIMITER +
+        "org.apache.jmeter.protocol.jms.sampler.PublisherSampler.\"jms.text_message\"" + PropertyAccessor.DELIMITER +
+        "org.apache.jmeter.protocol.smtp.sampler.SmtpSampler.\"SMTPSampler.message\""
+    );
+
+    // package access for unit tests with additional properties:
+    static void parseProperties(String properties) {
+        accessor.parseProperties(properties);
     }
 
     public static String getPayload(Sampler sampler) {
@@ -82,20 +39,8 @@ public class SamplerPayloadAccessor {
                 return null; 
             }
             return httpSampler.getArguments().getArgument(0).getValue(); 
-        }        
-        PropertyDescriptor accessor = findSamplerPayloadAccessor(sampler);
-        if (accessor != null) {
-            try {
-                return (String)accessor.getReadMethod().invoke(sampler, new Object[]{});
-            }
-            catch (InvocationTargetException e) {
-                log.error("Sampler payload getter exception: "+e.getCause());
-            }
-            catch (IllegalAccessException e) {
-                log.error("Sampler payload getter not accessible");
-            }
         }
-        return null;
+        return (String)accessor.getProperty(sampler);
     }
 
     public static void setPayload(Sampler sampler, String payload) {
@@ -103,17 +48,6 @@ public class SamplerPayloadAccessor {
             ((HTTPSamplerBase)sampler).getArguments().getArgument(0).setValue(payload);
             return;
         }
-        PropertyDescriptor accessor = findSamplerPayloadAccessor(sampler);
-        if (accessor != null) {
-            try {
-                accessor.getWriteMethod().invoke(sampler, new Object[]{payload});
-            }
-            catch (InvocationTargetException e) {
-                log.error("Sampler payload setter exception: "+e.getCause());
-            }
-            catch (IllegalAccessException e) {
-                log.error("Sampler payload setter not accessible");
-            }
-        }
+        accessor.setProperty(sampler, payload);
     }
 }

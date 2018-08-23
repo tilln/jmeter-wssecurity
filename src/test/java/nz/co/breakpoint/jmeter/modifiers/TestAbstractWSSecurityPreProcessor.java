@@ -40,20 +40,6 @@ public class TestAbstractWSSecurityPreProcessor extends TestWSSSecurityPreProces
     }
 
     @Test
-    public void testGetPayloadOfOtherSampler() throws Exception {
-        sampler.setContent(SAMPLE_SOAP_MSG);
-        String payload = instance.getSamplerPayload();
-        assertEquals(SAMPLE_SOAP_MSG, payload);
-    }
-
-    @Test
-    public void testSetPayloadOfOtherSampler() throws Exception {
-        instance.setSamplerPayload(SAMPLE_SOAP_MSG);
-        String payload = sampler.getContent();
-        assertEquals(SAMPLE_SOAP_MSG, payload);
-    }
-
-    @Test
     public void testProcess() throws Exception {
         sampler.setContent("<x>✓</x>");
         instance.process();
