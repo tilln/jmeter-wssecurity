@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 
@@ -23,16 +24,20 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
     protected Document process(Document document) throws WSSecurityException {
         WSSecurityEngine secEngine = new WSSecurityEngine();
 
-        WSHandlerResult results = secEngine.processSecurityHeader(document, null, 
-            new CallbackHandler() {
-                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                    for (Callback callback : callbacks) {
-                        if (callback instanceof WSPasswordCallback) {
-                            ((WSPasswordCallback)callback).setPassword(getCertPassword());
-                        }
+        RequestData requestData = new RequestData();
+        requestData.setSigVerCrypto(getCrypto());
+        requestData.setDecCrypto(getCrypto());
+        requestData.setActor(getActor());
+        requestData.setCallbackHandler(new CallbackHandler() {
+            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                for (Callback callback : callbacks) {
+                    if (callback instanceof WSPasswordCallback) {
+                        ((WSPasswordCallback)callback).setPassword(getCertPassword());
                     }
                 }
-            }, getCrypto());
+            }
+        });
+        WSHandlerResult results = secEngine.processSecurityHeader(document, requestData);
 
         return document;
     }

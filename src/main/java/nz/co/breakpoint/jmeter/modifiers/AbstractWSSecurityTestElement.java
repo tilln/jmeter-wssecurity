@@ -13,6 +13,8 @@ public abstract class AbstractWSSecurityTestElement extends AbstractXMLTestEleme
 
     static { WSSConfig.init(); }
 
+    private String actor;
+
     public AbstractWSSecurityTestElement() throws ParserConfigurationException {
         super();
     }
@@ -23,5 +25,14 @@ public abstract class AbstractWSSecurityTestElement extends AbstractXMLTestEleme
 
     protected SampleResult getResult() {
         return getThreadContext().getPreviousResult();
+    }
+
+    // Accessors
+    public String getActor() {
+        return actor;
+    }
+
+    public void setActor(String actor) {
+        this.actor = actor;
     }
 }

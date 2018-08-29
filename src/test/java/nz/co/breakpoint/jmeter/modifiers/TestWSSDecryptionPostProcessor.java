@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -43,6 +44,16 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
         mod.process();
         String decrypted = result.getResponseDataAsString();
         assertThat(decrypted, containsString("<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"));
+    }
+
+    @Test
+    public void testNoDecryptionIfActorMismatch() throws Exception {
+        result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/encrypted-body.xml")));
+        context.setPreviousResult(result);
+        mod.setActor("actor");
+        mod.process();
+        String decrypted = result.getResponseDataAsString();
+        assertThat(decrypted, not(containsString("<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">")));
     }
 
     @Test

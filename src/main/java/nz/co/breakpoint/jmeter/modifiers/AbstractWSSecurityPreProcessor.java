@@ -19,7 +19,6 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractWSSecurityT
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
-    private String actor;
     private boolean mustUnderstand;
 
     public AbstractWSSecurityPreProcessor() throws ParserConfigurationException {
@@ -69,14 +68,6 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractWSSecurityT
     }
 
     // Accessors
-    public String getActor() {
-        return actor;
-    }
-
-    public void setActor(String actor) {
-        this.actor = actor;
-    }
-
     public boolean isMustUnderstand() {
         return mustUnderstand;
     }
