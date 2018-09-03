@@ -1,9 +1,8 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
 import java.beans.PropertyDescriptor;
-import org.apache.jmeter.testbeans.BeanInfoSupport;
 
-public class AbstractWSSecurityPreProcessorBeanInfo extends BeanInfoSupport {
+public class AbstractWSSecurityPreProcessorBeanInfo extends AbstractWSSecurityTestElementBeanInfo {
 
     public AbstractWSSecurityPreProcessorBeanInfo(Class<? extends AbstractWSSecurityPreProcessor> clazz) {
         super(clazz);
