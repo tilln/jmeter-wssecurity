@@ -15,32 +15,28 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 
 public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorBase {
     private WSSDecryptionPostProcessor mod = null;
     private SampleResult result = null;
 
-    @ClassRule
-    public static final JMeterPropertiesResource props = new JMeterPropertiesResource();
-
     @Before
     public void setUp() throws Exception {
-        context = JMeterContextService.getContext();
         mod = new WSSDecryptionPostProcessor();
+        JMeterContext context = JMeterContextService.getContext();
         mod.setThreadContext(context);
         mod.setKeystoreFile("src/test/resources/keystore.jks");
         mod.setKeystorePassword("changeit");
         mod.setCertPassword("changeit");
         result = new SampleResult();
         result.setSuccessful(true);
+        context.setPreviousResult(result);
     }
 
     @Test
     public void testDecryption() throws Exception {
         result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/encrypted-body.xml")));
-        context.setPreviousResult(result);
         mod.process();
         String decrypted = result.getResponseDataAsString();
         assertThat(decrypted, containsString("<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"));
@@ -49,7 +45,6 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
     @Test
     public void testNoDecryptionIfActorMismatch() throws Exception {
         result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/encrypted-body.xml")));
-        context.setPreviousResult(result);
         mod.setActor("actor");
         mod.process();
         String decrypted = result.getResponseDataAsString();
@@ -69,7 +64,6 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
             +   "<SOAP-ENV:Body />"
             +"</SOAP-ENV:Envelope>",
             "UTF-8");
-        context.setPreviousResult(result);
 
         JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, "false");
         mod.process();
@@ -90,7 +84,6 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
     public void testNoFailureOnOtherException() throws Exception {
         JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, "true");
         result.setResponseData("<dummy />", "UTF-8");
-        context.setPreviousResult(result);
 
         mod.process();
 
@@ -102,7 +95,6 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
     @Test
     public void testSignatureValidation() throws Exception {
         result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/signed-body.xml")));
-        context.setPreviousResult(result);
 
         mod.process();
 

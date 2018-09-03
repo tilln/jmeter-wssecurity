@@ -6,7 +6,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
-import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.wss4j.dom.WSConstants;
 import org.junit.Before;
@@ -16,12 +15,6 @@ public class TestWSSUsernameTokenPreProcessor extends TestWSSSecurityPreProcesso
     private WSSUsernameTokenPreProcessor mod = null;
     private final static String USERNAME = "BREAKPOINT";
     private final static String PASSWORD = "JMETERROCKS";
-    private JMeterContext context = null;
-    
-    @Before
-    public void setUp() throws Exception {
-        context = JMeterContextService.getContext();
-    }
 
     @Test
     public void testAllUsernameTokenCombinations() throws Exception {
@@ -32,14 +25,13 @@ public class TestWSSUsernameTokenPreProcessor extends TestWSSSecurityPreProcesso
             for (boolean an : new boolean[]{true, false}) {
                 for (boolean ac : new boolean[]{true, false}) {
                     mod = new WSSUsernameTokenPreProcessor();
-                    mod.setThreadContext(context);
+                    mod.setThreadContext(JMeterContextService.getContext());
                     mod.setUsername(USERNAME);
                     mod.setPassword(PASSWORD);
                     mod.setPasswordType(pt);
                     mod.setAddNonce(an);
                     mod.setAddCreated(ac);
                     HTTPSamplerBase sampler = createHTTPSampler();
-                    context.setCurrentSampler(sampler);
                     mod.process();
                     String content = SamplerPayloadAccessor.getPayload(sampler);
                     assertThat(content, containsString(":UsernameToken"));
@@ -61,14 +53,13 @@ public class TestWSSUsernameTokenPreProcessor extends TestWSSSecurityPreProcesso
     public void testTimestampPrecision() throws Exception {
         for (boolean millis : new boolean[]{true, false}) {
             mod = new WSSUsernameTokenPreProcessor();
-            mod.setThreadContext(context);
+            mod.setThreadContext(JMeterContextService.getContext());
             mod.setPasswordType("Password Digest");
             mod.setUsername(USERNAME);
             mod.setPassword(PASSWORD);
             mod.setAddCreated(true);
             mod.setPrecisionInMilliSeconds(millis);
             HTTPSamplerBase sampler = createHTTPSampler();
-            context.setCurrentSampler(sampler);
             mod.process();
             String content = SamplerPayloadAccessor.getPayload(sampler);
             assertThat(content, containsString(":UsernameToken"));

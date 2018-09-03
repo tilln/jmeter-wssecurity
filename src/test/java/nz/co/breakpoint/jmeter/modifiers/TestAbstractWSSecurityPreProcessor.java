@@ -2,6 +2,7 @@ package nz.co.breakpoint.jmeter.modifiers;
 
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.jmeter.protocol.jms.sampler.JMSSampler;
+import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -32,7 +33,7 @@ public class TestAbstractWSSecurityPreProcessor extends TestWSSSecurityPreProces
 
     @Before
     public void setUp() throws Exception {
-        context = JMeterContextService.getContext();
+        JMeterContext context = JMeterContextService.getContext();
         instance = new DummyWSSecurityPreProcessor();
         instance.setThreadContext(context);
         sampler = new JMSSampler();

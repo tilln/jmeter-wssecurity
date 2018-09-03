@@ -13,9 +13,8 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
 
     @Before
     public void setUp() throws Exception {
-        context = JMeterContextService.getContext();
         mod = new WSSSignaturePreProcessor();
-        mod.setThreadContext(context);
+        mod.setThreadContext(JMeterContextService.getContext());
         initCertSettings(mod);
     }
 
@@ -33,7 +32,6 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
                             mod.setDigestAlgorithm(da);
                             mod.setUseSingleCertificate(us);
                             HTTPSamplerBase sampler = createHTTPSampler();
-                            context.setCurrentSampler(sampler);
                             mod.process();
                             String signedContent = SamplerPayloadAccessor.getPayload(sampler);
                             assertThat(signedContent, containsString("\"http://www.w3.org/2000/09/xmldsig#\""));

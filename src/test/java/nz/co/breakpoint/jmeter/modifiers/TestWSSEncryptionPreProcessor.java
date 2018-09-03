@@ -13,9 +13,8 @@ public class TestWSSEncryptionPreProcessor extends TestWSSSecurityPreProcessorBa
 
     @Before
     public void setUp() throws Exception {
-        context = JMeterContextService.getContext();
         mod = new WSSEncryptionPreProcessor();
-        mod.setThreadContext(context);
+        mod.setThreadContext(JMeterContextService.getContext());
         initCertSettings(mod);
     }
 
@@ -31,7 +30,6 @@ public class TestWSSEncryptionPreProcessor extends TestWSSSecurityPreProcessorBa
                         mod.setSymmetricEncryptionAlgorithm(se);
                         mod.setCreateEncryptedKey(ek);
                         HTTPSamplerBase sampler = createHTTPSampler();
-                        context.setCurrentSampler(sampler);
                         mod.process();
                         String encryptedContent = SamplerPayloadAccessor.getPayload(sampler);
                         assertThat(encryptedContent, containsString("Type=\"http://www.w3.org/2001/04/xmlenc#Content\""));

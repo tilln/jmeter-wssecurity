@@ -2,11 +2,15 @@ package nz.co.breakpoint.jmeter.modifiers;
 
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerFactory;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
-import org.apache.jmeter.threads.JMeterContext;
+import org.apache.jmeter.threads.JMeterContextService;
+import org.junit.ClassRule;
 
 public class TestWSSSecurityPreProcessorBase {
-    protected JMeterContext context = null;
-    
+    @ClassRule
+    public static final JMeterPropertiesResource props = new JMeterPropertiesResource();
+    @ClassRule
+    public static final JMeterContextResource ctx = new JMeterContextResource();
+
     protected static final String SAMPLE_SOAP_MSG = 
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
         + "<SOAP-ENV:Envelope "
@@ -24,6 +28,7 @@ public class TestWSSSecurityPreProcessorBase {
         HTTPSamplerBase sampler = HTTPSamplerFactory.newInstance();
         sampler.addNonEncodedArgument("", SAMPLE_SOAP_MSG, "");
         sampler.setPostBodyRaw(true);
+        JMeterContextService.getContext().setCurrentSampler(sampler);
         return sampler;
     }
     
