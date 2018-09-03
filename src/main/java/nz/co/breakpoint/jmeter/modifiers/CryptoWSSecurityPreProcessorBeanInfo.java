@@ -1,6 +1,7 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
 import java.beans.PropertyDescriptor;
+import java.util.ResourceBundle;
 import org.apache.jmeter.testbeans.gui.FileEditor;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.PasswordEditor;
@@ -37,10 +38,16 @@ public class CryptoWSSecurityPreProcessorBeanInfo extends AbstractWSSecurityPreP
 
     // This may be added to a property group by subclasses (if desired)
     protected PropertyDescriptor createPartsToSecureProperty() {
+        ResourceBundle rb = (ResourceBundle)getBeanDescriptor().getValue(RESOURCE_BUNDLE);
+
+        String[] headers = rb != null && rb.containsKey("partsToSecure.tableHeaders") ?
+            rb.getString("partsToSecure.tableHeaders").split("|") :
+            new String[]{"ID", "Name", "Namespace", "Encode"};
+
         PropertyDescriptor p = property("partsToSecure");
         p.setPropertyEditorClass(TableEditor.class);
         p.setValue(TableEditor.CLASSNAME, SecurityPart.class.getName());
-        p.setValue(TableEditor.HEADERS, new String[]{"ID", "Name", "Namespace", "Encode"});
+        p.setValue(TableEditor.HEADERS, headers);
         p.setValue(TableEditor.OBJECT_PROPERTIES, new String[]{"id", "name", "namespace", "modifier"});
         return p;
     }
