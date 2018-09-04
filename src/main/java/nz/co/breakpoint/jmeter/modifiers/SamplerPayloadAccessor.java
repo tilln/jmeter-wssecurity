@@ -22,6 +22,7 @@ public class SamplerPayloadAccessor {
         JMeterUtils.getPropDefault(ACCESSORS_CONFIG_PROPERTY, "") + PropertyAccessor.DELIMITER +
         "org.apache.jmeter.protocol.jms.sampler.JMSSampler.\"HTTPSamper.xml_data\"" + PropertyAccessor.DELIMITER +
         "org.apache.jmeter.protocol.jms.sampler.PublisherSampler.\"jms.text_message\"" + PropertyAccessor.DELIMITER +
+        "org.apache.jmeter.protocol.tcp.sampler.TCPSampler.\"TCPSampler.request\"" + PropertyAccessor.DELIMITER +
         "org.apache.jmeter.protocol.smtp.sampler.SmtpSampler.\"SMTPSampler.message\""
     );
 
