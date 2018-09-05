@@ -1,6 +1,6 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.wss4j.common.WSEncryptionPart;
 
@@ -16,7 +16,6 @@ public class SecurityPart extends AbstractTestElement {
     
     private static final String NAMESPACE = "SecurityPart.Namespace", MODIFIER = "SecurityPart.Modifier", ID ="SecurityPart.ID";
 
-
     public SecurityPart() {}
 
     public String getNamespace() { return getPropertyAsString(NAMESPACE); }
@@ -25,13 +24,10 @@ public class SecurityPart extends AbstractTestElement {
 
     public String getModifier() { return getPropertyAsString(MODIFIER); }
 
-    public void setId(String id){
-        setProperty(ID, id);
-    }
+    public void setId(String id){ setProperty(ID, id); }
 
-    public String getId(){
-        return getPropertyAsString(ID);
-    }
+    public String getId(){ return getPropertyAsString(ID); }
+
     /* @param modifier: "Content" or "Element"
      */
     public void setModifier(String modifier) { setProperty(MODIFIER, modifier); }
