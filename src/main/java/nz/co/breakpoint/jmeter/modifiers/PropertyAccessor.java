@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.FunctionProperty;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.testelement.property.NullProperty;
 import org.apache.jmeter.util.JMeterUtils;
@@ -83,7 +84,8 @@ public class PropertyAccessor {
             JMeterProperty prop = element.getProperty(propertyName);
             if (!(prop instanceof NullProperty)) {
                 log.debug("Using JMeter property "+prop.getName()+" for getting property value");
-                return prop.getObjectValue();
+                return (prop instanceof FunctionProperty) ? prop.getStringValue() // function evaluation only happens when getting the String value
+                    : prop.getObjectValue(); // otherwise return actual stored Object (which may be a String)
             }
             try {
                 PropertyDescriptor accessor = new PropertyDescriptor(propertyName, element.getClass());
