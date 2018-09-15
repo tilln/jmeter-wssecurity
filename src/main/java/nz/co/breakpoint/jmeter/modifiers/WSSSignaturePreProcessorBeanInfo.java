@@ -1,6 +1,7 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
 import java.beans.PropertyDescriptor;
+import org.apache.jmeter.testbeans.gui.TableEditor;
 
 public class WSSSignaturePreProcessorBeanInfo extends CryptoWSSecurityPreProcessorBeanInfo {
 
@@ -9,7 +10,7 @@ public class WSSSignaturePreProcessorBeanInfo extends CryptoWSSecurityPreProcess
 
         createPropertyGroup("Signature", new String[]{ 
             "keyIdentifier", "signatureAlgorithm", "signatureCanonicalization", "digestAlgorithm", "useSingleCertificate",
-            createPartsToSecureProperty().getName()
+            createPartsToSecureProperty().getName(), "attachments"
         });
         PropertyDescriptor p;
 
@@ -40,5 +41,12 @@ public class WSSSignaturePreProcessorBeanInfo extends CryptoWSSecurityPreProcess
         p = property("useSingleCertificate");
         p.setValue(NOT_UNDEFINED, Boolean.TRUE);
         p.setValue(DEFAULT, Boolean.FALSE);
+
+        p = property("attachments");
+        p.setPropertyEditorClass(TableEditor.class);
+        p.setValue(TableEditor.CLASSNAME, Attachment.class.getName());
+        p.setValue(TableEditor.HEADERS, getTableHeadersWithDefaults("attachments.tableHeaders",
+            new String[]{"ID", "Bytes (base64)", "Headers"}));
+        p.setValue(TableEditor.OBJECT_PROPERTIES, new String[]{"name", "content", "headers"});
     }
 }

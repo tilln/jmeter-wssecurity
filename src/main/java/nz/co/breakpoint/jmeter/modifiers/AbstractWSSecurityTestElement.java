@@ -1,5 +1,7 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.samplers.SampleResult;
@@ -15,6 +17,8 @@ public abstract class AbstractWSSecurityTestElement extends AbstractXMLTestEleme
     static { WSSConfig.init(); }
 
     private String actor;
+    protected List<Attachment> attachments = new ArrayList<Attachment>();
+    private AttachmentCallbackHandler attachmentCallbackHandler = null;
 
     public AbstractWSSecurityTestElement() throws ParserConfigurationException {
         super();
@@ -26,6 +30,25 @@ public abstract class AbstractWSSecurityTestElement extends AbstractXMLTestEleme
 
     protected SampleResult getResult() {
         return getThreadContext().getPreviousResult();
+    }
+
+    protected List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    protected AttachmentCallbackHandler getAttachmentCallbackHandler() {
+        return attachmentCallbackHandler;
+    }
+
+    // Get attachments from TestElement to attachmentCallbackHandler for wss4j processing
+    protected void updateAttachmentCallbackHandler() {
+        if (attachmentCallbackHandler == null) {
+            attachmentCallbackHandler = new AttachmentCallbackHandler();
+        }
+        for (Attachment a : attachments) {
+            // Multiple calls won't cause duplicates assuming that an attachment's cid won't change (so the same attachment would be overwritten):
+            attachmentCallbackHandler.addAttachment(a.toWss4jAttachment());
+        }
     }
 
     // Accessors

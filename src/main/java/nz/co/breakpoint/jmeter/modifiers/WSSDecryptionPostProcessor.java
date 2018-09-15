@@ -1,6 +1,7 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
 import java.io.IOException;
+import java.util.List;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -28,6 +29,9 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
         requestData.setSigVerCrypto(getCrypto());
         requestData.setDecCrypto(getCrypto());
         requestData.setActor(getActor());
+        updateAttachmentCallbackHandler();
+        requestData.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
+        requestData.setExpandXopIncludeForSignature(true); // as of wss4j v2.2 .setExpandXopInclude(true);
         requestData.setCallbackHandler(new CallbackHandler() {
             public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                 for (Callback callback : callbacks) {
@@ -40,5 +44,14 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
         WSHandlerResult results = secEngine.processSecurityHeader(document, requestData);
 
         return document;
+    }
+
+    // Accessors
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 }

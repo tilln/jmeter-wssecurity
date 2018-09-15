@@ -7,8 +7,12 @@ import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 
+import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Base64;
+import org.apache.commons.io.IOUtils;
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
@@ -100,5 +104,63 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
 
         assertTrue(result.isSuccessful());
         assertEquals(0, result.getAssertionResults().length);
+    }
+
+    @Test
+    public void testFindAttachment() throws Exception {
+        SampleResult sub = new SampleResult();
+        sub.setSampleLabel("foobar");
+        sub.setResponseHeaders("Content-Type: foobar\n"+
+            "Content-ID: attachme");
+        result.addRawSubResult(sub);
+
+        assertEquals(sub, mod.findAttachment("attachme", result));
+        assertEquals(null, mod.findAttachment("foobar", result));
+
+        JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.SAMPLE_LABEL_REGEX, "(.*)");
+        assertEquals(null, mod.findAttachment("attachme", result));
+        assertEquals(sub, mod.findAttachment("foobar", result));
+    }
+
+    @Test
+    public void testSwADecryption() throws Exception {
+        result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/encrypted-attachment.xml")));
+        mod.setAttachments(Arrays.asList(new Attachment("foobar", "", "f4Sw//ZXCbuPnThtylTb0QIJr05w9k4mBo5F0DknerE=", "", "", "")));
+
+        mod.process();
+
+        assertTrue(result.isSuccessful());
+        assertEquals(1, result.getSubResults().length);
+        SampleResult a = result.getSubResults()[0];
+        assertEquals("Attachment cid:foobar", a.getSampleLabel());
+        assertEquals("attachme", a.getResponseDataAsString());
+        assertEquals("", a.getResponseHeaders());
+    }
+
+    @Test
+    public void testSwADecryptionWithHeaders() throws Exception {
+        result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/encrypted-attachment-header.xml")));
+        mod.setAttachments(Arrays.asList(new Attachment("foobar", "", "sim44AGzLygo+lC42uG3jSoC+QRuI1bVf/cx06uFE5ZECbk7x9iefOpplHdKk4M5mlcz8CksXft5JHEIId/e/g==", "", "", "")));
+
+        mod.process();
+
+        assertTrue(result.isSuccessful());
+        assertEquals(1, result.getSubResults().length);
+        SampleResult a = result.getSubResults()[0];
+        assertEquals("Attachment cid:foobar", a.getSampleLabel());
+        assertEquals("attachme", a.getResponseDataAsString());
+        assertEquals("Content-Type:text/plain\n", a.getResponseHeaders());
+    }
+
+    @Test
+    public void testXopDecryption() throws Exception {
+        result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/encrypted-attachment-xop.xml")));
+
+        mod.process();
+
+        String decrypted = result.getResponseDataAsString();
+        assertThat(decrypted, containsString("YXR0YWNobWU="));
+        assertTrue(result.isSuccessful());
+        assertEquals(0, result.getSubResults().length);
     }
 }
