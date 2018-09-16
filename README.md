@@ -38,7 +38,8 @@ Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecu
 	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.2.2/wss4j-ws-security-dom-2.2,2.jar)
 	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/2.2.2/wss4j-ws-security-common-2.2.2.jar)
 	* [org.apache.santuario / xmlsec](https://search.maven.org/remotecontent?filepath=org/apache/santuario/xmlsec/2.1.2/xmlsec-2.1.2.jar)
-3. Restart JMeter.
+3. Make sure to remove older versions of the above dependencies from the JMeter lib directory.
+4. Restart JMeter.
 
 Usage
 ------------
