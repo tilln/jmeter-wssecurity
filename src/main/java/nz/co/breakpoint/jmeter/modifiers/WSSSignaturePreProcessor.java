@@ -45,13 +45,11 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA384,  XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA512,
         XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1,      XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256,
         XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384,    XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512,
-        XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160, // not supported as of wss4j v2.2
     };
 
     static final String[] digestAlgorithms = new String[]{
         MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1,      MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA256,
         MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA384,    MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA512,
-        MessageDigestAlgorithm.ALGO_ID_DIGEST_RIPEMD160, // not supported as of wss4j v2.2
     };
 
     public WSSSignaturePreProcessor() throws ParserConfigurationException {
@@ -61,8 +59,8 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
     @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
         log.debug("Initializing WSSecSignature");
-        WSSecSignature secBuilder = new WSSecSignature(); // as of wss4j v2.2: WSSecSignature(secHeader);
-        // secBuilder.setExpandXopInclude(true); // don't sign just the xop reference but inline the attachment content first // available as of wss4j v2.2
+        WSSecSignature secBuilder = new WSSecSignature(secHeader);
+        secBuilder.setExpandXopInclude(true); // don't sign just the xop reference but inline the attachment content first
 
         secBuilder.setUserInfo(getCertAlias(), getCertPassword());
         setKeyIdentifier(secBuilder);
@@ -75,7 +73,7 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         secBuilder.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
 
         log.debug("Building WSSecSignature");
-        return secBuilder.build(document, getCrypto(), secHeader); // as of wss4j v2.2: build(getCrypto());
+        return secBuilder.build(getCrypto());
     }
 
     // Accessors

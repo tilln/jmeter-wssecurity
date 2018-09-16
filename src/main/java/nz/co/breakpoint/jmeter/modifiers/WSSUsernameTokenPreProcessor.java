@@ -49,7 +49,7 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
     @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
         log.debug("Initializing WSSecUsernameToken");
-        WSSecUsernameToken secBuilder = new WSSecUsernameToken(); // as of wss4j v2.2: WSSecUsernameToken(secHeader);
+        WSSecUsernameToken secBuilder = new WSSecUsernameToken(secHeader);
 
         secBuilder.setUserInfo(getUsername(), getPassword());
         if (isAddNonce()) secBuilder.addNonce();
@@ -60,14 +60,14 @@ public class WSSUsernameTokenPreProcessor extends AbstractWSSecurityPreProcessor
         if ("No Password".equals(getPasswordType())) {
             /* An empty password GUI field will result in an empty password string "", regardless of password type.
              * This would cause a NPE in org.apache.wss4j.dom.message.token.UsernameToken.setPassword("") 
-             * (https://github.com/apache/wss4j/blob/wss4j-2.1.8/ws-security-dom/src/main/java/org/apache/wss4j/dom/message/token/UsernameToken.java#L534)
+             * (https://github.com/apache/wss4j/blob/wss4j-2.2.2/ws-security-dom/src/main/java/org/apache/wss4j/dom/message/token/UsernameToken.java#L508)
              * when trying to retrieve the password element that is not there (as per password type).
              * Therefore it needs to be set to null explicitly.
              */
             secBuilder.setUserInfo(getUsername(), null);
         }
         log.debug("Building WSSecUsernameToken");
-        return secBuilder.build(document, secHeader); // as of wss4j v2.2: build();
+        return secBuilder.build();
     }
 
     // Accessors

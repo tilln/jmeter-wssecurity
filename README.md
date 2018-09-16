@@ -29,15 +29,15 @@ Under tab "Available Plugins", select "WS Security for SOAP", then click "Apply 
 
 ### Via Package from [JMeter-Plugins.org](https://jmeter-plugins.org/)
 
-Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.5.zip) into JMeter's lib directory, then restart JMeter.
+Extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.6.zip) into JMeter's lib directory, then restart JMeter.
 
 ### Via Manual Download
 
-1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.5/jmeter-wssecurity-1.5.jar) into JMeter's lib/ext directory.
+1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.6/jmeter-wssecurity-1.6.jar) into JMeter's lib/ext directory.
 2. Copy the following dependencies into JMeter's lib directory:
-	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.1.8/wss4j-ws-security-dom-2.1.8.jar)
-	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/2.1.8/wss4j-ws-security-common-2.1.8.jar)
-	* [org.apache.santuario / xmlsec](https://search.maven.org/remotecontent?filepath=org/apache/santuario/xmlsec/2.0.8/xmlsec-2.0.8.jar)
+	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.2.2/wss4j-ws-security-dom-2.2,2.jar)
+	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/2.2.2/wss4j-ws-security-common-2.2.2.jar)
+	* [org.apache.santuario / xmlsec](https://search.maven.org/remotecontent?filepath=org/apache/santuario/xmlsec/2.1.2/xmlsec-2.1.2.jar)
 3. Restart JMeter.
 
 Usage
@@ -224,10 +224,6 @@ Example:
 
 Suppose a sampler generates a main sample with an attachment sub-sample "somecontentid (text/xml)" but does not set the Content-ID header.
 Using the property value `jmeter.wssecurity.findAttachmentsBySampleLabel=(.*) \(.*\)` this sub-sample will be identified based on the first matcher group "somecontentid".
-
-#### Limitations/Known Issues
-
-[XOP attachments](https://www.w3.org/TR/xop10/) are not currently supported and will result in validation failures if included in signature or encryption.
 
 Troubleshooting
 ---------------

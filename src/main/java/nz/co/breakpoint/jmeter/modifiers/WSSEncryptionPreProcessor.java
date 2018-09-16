@@ -35,7 +35,6 @@ public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
     static final String[] keyEncryptionAlgorithms = new String[]{
         WSConstants.KEYTRANSPORT_RSAOAEP_XENC11,
         WSConstants.KEYTRANSPORT_RSA15,
-        WSConstants.KEYTRANSPORT_RSAOEP, // not supported as of wss4j v2.2
     };
 
     static final String[] symmetricEncryptionAlgorithms = new String[]{
@@ -52,8 +51,8 @@ public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
     @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
         log.debug("Initializing WSSecEncrypt");
-        WSSecEncrypt secBuilder = new WSSecEncrypt(); // as of wss4j v2.2: WSSecEncrypt(secHeader);
-        // secBuilder.setExpandXopInclude(true); // don't encrypt just the xop reference but inline the attachment content first // available as of wss4j v2.2
+        WSSecEncrypt secBuilder = new WSSecEncrypt(secHeader);
+        secBuilder.setExpandXopInclude(true); // don't encrypt just the xop reference but inline the attachment content first
 
         secBuilder.setUserInfo(getCertAlias(), getCertPassword());
         setKeyIdentifier(secBuilder);
@@ -65,7 +64,7 @@ public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
         secBuilder.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
 
         log.debug("Building WSSecEncrypt");
-        return secBuilder.build(document, getCrypto(), secHeader); // as of wss4j v2.2: build(getCrypto());
+        return secBuilder.build(getCrypto());
     }
 
     // Accessors

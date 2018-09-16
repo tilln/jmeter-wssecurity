@@ -31,7 +31,7 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
         requestData.setActor(getActor());
         updateAttachmentCallbackHandler();
         requestData.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
-        requestData.setExpandXopIncludeForSignature(true); // as of wss4j v2.2 .setExpandXopInclude(true);
+        requestData.setExpandXopInclude(true);
         requestData.setCallbackHandler(new CallbackHandler() {
             public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                 for (Callback callback : callbacks) {
