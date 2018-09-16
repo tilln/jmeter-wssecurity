@@ -46,7 +46,7 @@ public class WSSSignaturePreProcessorBeanInfo extends CryptoWSSecurityPreProcess
         p.setPropertyEditorClass(TableEditor.class);
         p.setValue(TableEditor.CLASSNAME, Attachment.class.getName());
         p.setValue(TableEditor.HEADERS, getTableHeadersWithDefaults("attachments.tableHeaders",
-            new String[]{"ID", "Bytes (base64)", "Headers"}));
+            new String[]{"Content-ID", "Bytes (base64)", "Headers"}));
         p.setValue(TableEditor.OBJECT_PROPERTIES, new String[]{"name", "content", "headers"});
     }
 }
