@@ -157,7 +157,7 @@ public class TestWSSAttachments extends TestWSSSecurityPreProcessorBase {
         assertThat(IOUtils.toString((byte[])context.getVariables().getObject("output"), "UTF-8"), not(containsString("attachme")));
     }
 
-    // @Test needs wss4j v2.2
+    @Test
     public void testXopEncryption() throws Exception {
         Sampler sampler = createHTTPSampler();
         WSSEncryptionPreProcessor mod = setupEncryptionPreProcessor();
