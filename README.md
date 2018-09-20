@@ -63,23 +63,23 @@ Users familiar with SoapUI will find similarities to the [outgoing WS-Security c
 
 ### SOAP Message Signer
 
-![SOAP Message Signer](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/signature.png)
+![SOAP Message Signer](docs/signature.png)
 
 ### SOAP Message Encrypter
 
-![SOAP Message Encrypter](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/encryption.png)
+![SOAP Message Encrypter](docs/encryption.png)
 
 ### SOAP Message Username Token
 
-![SOAP Message Username Token](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/usernametoken.png)
+![SOAP Message Username Token](docs/usernametoken.png)
 
 ### SOAP Message Timestamp
 
-![SOAP Message Timestamp](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/timestamp.png)
+![SOAP Message Timestamp](docs/timestamp.png)
 
 ### SOAP Message Decrypter
 
-![SOAP Message Decrypter](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/decryption.png)
+![SOAP Message Decrypter](docs/decryption.png)
 
 Configuration
 -------------
@@ -169,7 +169,7 @@ SOAP Message [Attachments](http://docs.oasis-open.org/wss-m/wss/v1.1.1/os/wss-Sw
 can be digitally secured or validated/decrypted by the plugin.
 However, the attachment data must be explicitely provided and must match the attachment(s) transmitted by the sampler,
 i.e. the plugin is unable to automatically access samplers' attachments.
-To do this, the below lists have to be filled in with one row for each attachment.
+To do this, the below lists (Attachments to Sign/Encrypt/Decrypt) have to be filled in with one row for each attachment.
 
 Additionally, for SwA attachments, the special ID `cid:Attachments` needs to be added to the "Parts to Sign"/"Parts to Encrypt" (without Name or Namespace).
 The Encode column can be either:
