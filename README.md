@@ -57,19 +57,19 @@ Users familiar with SoapUI will find similarities to the [outgoing WS-Security c
 
 ### SOAP Message Signer
 
-![SOAP Message Signer](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/signature.png)
+![SOAP Message Signer](docs/signature.png)
 
 ### SOAP Message Encrypter
 
-![SOAP Message Encrypter](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/encryption.png)
+![SOAP Message Encrypter](docs/encryption.png)
 
 ### SOAP Message Username Token
 
-![SOAP Message Username Token](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/usernametoken.png)
+![SOAP Message Username Token](docs/usernametoken.png)
 
 ### SOAP Message Decrypter
 
-![SOAP Message Decrypter](https://raw.githubusercontent.com/tilln/jmeter-wssecurity/master/docs/decryption.png)
+![SOAP Message Decrypter](docs/decryption.png)
 
 Configuration
 -------------
