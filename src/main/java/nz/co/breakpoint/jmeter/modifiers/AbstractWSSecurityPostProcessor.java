@@ -71,7 +71,7 @@ public abstract class AbstractWSSecurityPostProcessor extends AbstractWSSecurity
     /* The attachmentCallbackHandler may contain response attachments that have been processed
      * (i.e. decrypted) by wss4j. This method updates the SampleResult with those attachments,
      * by either replacing a subresult that matches the attachment CID or by creating a new subresult.
-     * Matching is based on the subresult's label together with a configurable regex.
+     * Matching is based on the subresult's Content-ID header or its sample label together with a configurable regex.
      */
     protected void retrieveProcessedAttachments(SampleResult prev) {
         if (getAttachmentCallbackHandler() == null) {
@@ -85,31 +85,36 @@ public abstract class AbstractWSSecurityPostProcessor extends AbstractWSSecurity
             for (org.apache.wss4j.common.ext.Attachment attachment : getAttachmentCallbackHandler().getAttachments()) {
                 String cid = attachment.getId();
 
-                SampleResult result = findAttachment(cid, prev);
-                if (result != null) {
-                    log.debug("Updating subresult "+result.getSampleLabel()+" with content from cid:"+cid);
+                SampleResult subresult = findAttachment(cid, prev);
+                if (subresult != null) {
+                    log.debug("Updating subresult "+subresult.getSampleLabel()+" with content from cid:"+cid);
                 }
                 else {
                     log.debug("No subresult found, creating new one for cid:"+cid);
-                    result = new SampleResult(prev.getTimeStamp(), 0 /*elapsed not applicable*/);
-                    prev.addRawSubResult(result);
-                    result.setSampleLabel("Attachment cid:"+cid);
-                    result.setSuccessful(true);
+                    subresult = new SampleResult(prev.getTimeStamp(), 0 /*elapsed not applicable*/);
+                    prev.addRawSubResult(subresult);
+                    subresult.setSampleLabel("Attachment cid:"+cid);
+                    subresult.setSuccessful(true);
                 }
-                result.setContentType(attachment.getMimeType());
-                result.setEncodingAndType(attachment.getMimeType());
-                result.setResponseHeaders(result.getResponseHeaders() + Attachment.fromHeadersMap(attachment.getHeaders()));
-                try {
-                    result.setResponseData(IOUtils.toByteArray(attachment.getSourceStream())); // could be a binary attachment, so don't just treat as String
-                }
-                catch (IOException e) {
-                    log.error("Failed to read source stream for attachment cid:"+cid, e);
-                }
+                updateSampleResult(attachment, subresult);
             }
         }
     }
 
-    // Recursivley (depth-first) look for a SampleResult matching the decrypted attachment's cid
+    /* Transfer any details from the received attachment to the subresult.
+     * Here just only the data is being read (which could be from a decrypting stream).
+     * Subclasses should refine this method to set additional subresult fields such as headers etc.
+     */
+    protected void updateSampleResult(org.apache.wss4j.common.ext.Attachment attachment, SampleResult subresult) {
+        try {
+            subresult.setResponseData(IOUtils.toByteArray(attachment.getSourceStream())); // could be a binary attachment, so don't just treat as String
+        }
+        catch (IOException e) {
+            log.error("Failed to read source stream for attachment cid:"+attachment.getId(), e);
+        }
+    }
+
+    // Recursively (depth-first) look for a SampleResult matching the decrypted attachment's cid
     protected SampleResult findAttachment(String cid, SampleResult result) {
         if (result == null) return null; // should not normally happen
 

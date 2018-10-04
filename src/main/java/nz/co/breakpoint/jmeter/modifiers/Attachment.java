@@ -63,9 +63,17 @@ public class Attachment extends AbstractTestElement {
     public static org.apache.wss4j.common.ext.Attachment toWss4jAttachment(Attachment attachment) {
         org.apache.wss4j.common.ext.Attachment a = new org.apache.wss4j.common.ext.Attachment();
         a.setId(attachment.getName());
-        a.setMimeType(attachment.getMimeType());
         a.setSourceStream(toSourceStream(attachment.getContent()));
-        a.addHeaders(toHeadersMap(attachment.getHeaders()));
+
+        Map<String, String> headers = toHeadersMap(attachment.getHeaders());
+        a.addHeaders(headers);
+
+        String mimeType = attachment.getMimeType();
+        if (mimeType == null || mimeType.length() == 0) {
+            // no MimeType defined in GUI, so take from header (for <xenc:EncryptedData> MimeType attribute)
+            mimeType = headers.get("Content-Type"); // assuming wss4j can cope with null value
+        }
+        a.setMimeType(mimeType);
         return a;
     }
 

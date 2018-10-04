@@ -37,7 +37,7 @@ Under tab "Available Plugins", select "WS Security for SOAP", then click "Apply 
 
 1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.6/jmeter-wssecurity-1.6.jar) into JMeter's lib/ext directory.
 2. Copy the following dependencies into JMeter's lib directory:
-	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.2.2/wss4j-ws-security-dom-2.2,2.jar)
+	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.2.2/wss4j-ws-security-dom-2.2.2.jar)
 	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/2.2.2/wss4j-ws-security-common-2.2.2.jar)
 	* [org.apache.santuario / xmlsec](https://search.maven.org/remotecontent?filepath=org/apache/santuario/xmlsec/2.1.2/xmlsec-2.1.2.jar)
 3. Make sure to remove older versions of the above dependencies from the JMeter lib directory.
@@ -200,7 +200,13 @@ This can be done is a few different ways. The following columns determine how th
     * "Base64": Assign encrypted bytes to JMeter variable as a base64-encoded String (variable name as per "Output Destination" column)
 * Output Destination: Name of the file/variable/property that will hold the encrypted attachment data.
 
-Note: Headers will be contained within the encrypted data, and not stored separately (only applicable for Encode: "Element" as above).
+Notes:
+* For Encode="Element" (`Attachment-Complete` as above), headers will be contained within the encrypted data.
+However, this plugin cannot modify the headers sent by the sampler, so the user needs to ensure
+that sensitive headers are removed from the attachment part.
+* The `Content-Type` header value may be required for the `<xenc:EncryptedData>` MimeType attribute
+as per [processing rules](http://docs.oasis-open.org/wss-m/wss/v1.1.1/os/wss-SwAProfile-v1.1.1-os.html#_Toc307412712),
+so the user needs to provide it in the Headers column.
 
 #### Attachments to Decrypt
 
@@ -210,6 +216,7 @@ The plugin can also decrypt response attachments. They need to be listed as foll
 This will most likely be retrieved by some custom code snippet via [`__groovy()`](https://jmeter.apache.org/usermanual/functions.html#__groovy)
 accessing [`ctx.previousResult.subResults`](https://jmeter.apache.org/api/org/apache/jmeter/samplers/SampleResult.html#getSubResults--),
 depending on how the sampler handles response attachments.
+Example: `${__groovy(ctx.previousResult.subResults[0].responseData.encodeBase64())}`
 
 Note: If an attachment is referenced in the response's WSS header but not included in the "Attachments to Decrypt" list, response validation will fail.
 
