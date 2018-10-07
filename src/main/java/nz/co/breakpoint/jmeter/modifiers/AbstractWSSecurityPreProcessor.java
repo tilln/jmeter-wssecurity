@@ -1,11 +1,13 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
+import java.io.File;
+import java.io.IOException;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.jmeter.processor.PreProcessor;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecBase;
@@ -61,9 +63,42 @@ public abstract class AbstractWSSecurityPreProcessor extends AbstractWSSecurityT
             doc = this.build(doc, secHeader); // Delegate in abstract method
 
             setSamplerPayload(documentToString(doc));
+
+            retrieveProcessedAttachments();
         }
         catch (Exception e) {
             log.error("Processing failed! ", e);
+        }
+    }
+
+    /* The attachmentCallbackHandler may contain request attachments that have been processed
+     * (encrypted or signed) by wss4j. This method retrieves any attachments the user cares about
+     * (i.e. listed in the script) and makes them available as a file or JMeter variable, so
+     * they can be attached to the actual sampler in order to send them.
+     */
+    protected void retrieveProcessedAttachments() {
+        if (getAttachmentCallbackHandler() == null) {
+            log.debug("AttachmentCallbackHandler undefined, skip retrieving attachments");
+        } else if (getAttachments() == null) {
+            log.debug("No attachments defined, skip retrieving attachments");
+        } else {
+            for (Attachment a : getAttachments()) {
+                String cid = a.getName();
+                org.apache.wss4j.common.ext.Attachment attachment = getAttachmentCallbackHandler().getAttachment(cid);
+
+                if (attachment == null) {
+                    log.warn("No attachment found with cid:"+cid);
+                } else {
+                    log.debug((a.getMode().length() == 0) ? "No output mode defined, discarding attachment cid:"+cid
+                        : "Storing attachment cid:"+cid+" as "+a.getMode()+"="+a.getDestination());
+                    try {
+                        a.toJmeter(attachment.getSourceStream());
+                    }
+                    catch (IOException e) {
+                        log.error("Failed to store attachment cid:"+cid, e);
+                    }
+                }
+            }
         }
     }
 

@@ -26,13 +26,13 @@ public class WSSTimestampPreProcessor extends AbstractWSSecurityPreProcessor {
     @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
         log.debug("Initializing WSSecTimestamp");
-        WSSecTimestamp secBuilder = new WSSecTimestamp(); // as of wss4j v2.2: WSSecTimestamp(secHeader);
+        WSSecTimestamp secBuilder = new WSSecTimestamp(secHeader);
 
         secBuilder.setTimeToLive(getTimeToLive());
         secBuilder.setPrecisionInMilliSeconds(isPrecisionInMilliSeconds());
 
         log.debug("Building WSSecTimestamp");
-        return secBuilder.build(document, secHeader); // as of wss4j v2.2: build();
+        return secBuilder.build();
     }
 
     public int getTimeToLive() {

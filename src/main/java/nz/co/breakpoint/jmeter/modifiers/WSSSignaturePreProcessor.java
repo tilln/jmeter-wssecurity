@@ -45,13 +45,11 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA384,  XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA512,
         XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1,      XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256,
         XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384,    XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512,
-        XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160,
     };
 
     static final String[] digestAlgorithms = new String[]{
         MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1,      MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA256,
         MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA384,    MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA512,
-        MessageDigestAlgorithm.ALGO_ID_DIGEST_RIPEMD160,
     };
 
     public WSSSignaturePreProcessor() throws ParserConfigurationException {
@@ -61,7 +59,8 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
     @Override
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
         log.debug("Initializing WSSecSignature");
-        WSSecSignature secBuilder = new WSSecSignature(); // as of wss4j v2.2: WSSecSignature(secHeader);
+        WSSecSignature secBuilder = new WSSecSignature(secHeader);
+        secBuilder.setExpandXopInclude(true); // don't sign just the xop reference but inline the attachment content first
 
         secBuilder.setUserInfo(getCertAlias(), getCertPassword());
         setKeyIdentifier(secBuilder);
@@ -70,9 +69,11 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         secBuilder.setSigCanonicalization(getSignatureCanonicalization());
         secBuilder.setDigestAlgo(getDigestAlgorithm());
         secBuilder.setUseSingleCertificate(isUseSingleCertificate());
+        updateAttachmentCallbackHandler();
+        secBuilder.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
 
         log.debug("Building WSSecSignature");
-        return secBuilder.build(document, getCrypto(), secHeader); // as of wss4j v2.2: build(getCrypto());
+        return secBuilder.build(getCrypto());
     }
 
     // Accessors
@@ -122,5 +123,13 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
 
     public void setPartsToSecure(List<SecurityPart> partsToSecure) {
         this.partsToSecure = partsToSecure;
+    }
+
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 }
