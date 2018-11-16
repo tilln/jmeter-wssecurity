@@ -38,6 +38,7 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
         updateAttachmentCallbackHandler();
         requestData.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
         requestData.setExpandXopInclude(true);
+        requestData.setAllowRSA15KeyTransportAlgorithm(true);
         requestData.setCallbackHandler(new CallbackHandler() {
             public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                 for (Callback callback : callbacks) {
