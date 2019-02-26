@@ -6,7 +6,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 
 /* This class models a part of the XML document that 
  * is to be secured (i.e. digitally signed or encrypted).
- * That part is identified by two attributes:
+ * That part is either identified by its wsu-Id or two attributes:
  * - Its local name (inherited property)
  * - Its namespace (URI)
  * A modifier attribute determines whether to sign/encrypt
@@ -36,12 +36,16 @@ public class SecurityPart extends AbstractTestElement {
      */
     public WSEncryptionPart getPart() {
         WSEncryptionPart part;
-        if(!StringUtils.isEmpty(getId())){
+        if (!StringUtils.isEmpty(getId())) {
             part = new WSEncryptionPart(getId(), getModifier());
         } else {
             part = new WSEncryptionPart(getName(), getNamespace(), getModifier());
         }
         part.setRequired(false); // treat as optional
         return part;
+    }
+
+    public String toString() {
+        return (!StringUtils.isEmpty(getId()) ? getId() : "{"+getNamespace()+"}"+getName())+":"+getModifier();
     }
 }
