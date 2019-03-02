@@ -1,12 +1,17 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
+import static nz.co.breakpoint.jmeter.modifiers.CryptoWSSecurityPreProcessor.getKeyIdentifierLabelForType;
+import static nz.co.breakpoint.jmeter.modifiers.WSSSignaturePreProcessor.*;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.wss4j.dom.WSConstants;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Collections;
 
 public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBase {
     private WSSSignaturePreProcessor mod = null;
@@ -20,10 +25,10 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
 
     @Test
     public void testAllSignatureCombinations() throws Exception {
-        for (String ki : WSSSignaturePreProcessor.keyIdentifiers) {
-            for (String sc : WSSSignaturePreProcessor.signatureCanonicalizations) {
-                for (String sa : WSSSignaturePreProcessor.signatureAlgorithms) {
-                    for (String da : WSSSignaturePreProcessor.digestAlgorithms) {
+        for (String ki : keyIdentifiers) {
+            for (String sc : signatureCanonicalizations) {
+                for (String sa : signatureAlgorithms) {
+                    for (String da : digestAlgorithms) {
                         for (boolean us : new boolean[]{true, false}) {
                             initCertSettings(mod, sa);
                             mod.setKeyIdentifier(ki);
@@ -43,5 +48,23 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
                 }
             }
         }
+    }
+
+    @Test
+    public void testSignedBinarySecurityToken() throws Exception {
+        HTTPSamplerBase sampler = createHTTPSampler();
+        SecurityPart bstPart = new SecurityPart();
+        bstPart.setName(WSConstants.BINARY_TOKEN_LN);
+        bstPart.setNamespace(WSConstants.WSSE_NS);
+        mod.setPartsToSecure(Collections.singletonList(bstPart));
+        mod.setKeyIdentifier(getKeyIdentifierLabelForType(WSConstants.BST_DIRECT_REFERENCE));
+        mod.setSignatureCanonicalization(signatureCanonicalizations[0]);
+        mod.setSignatureAlgorithm(signatureAlgorithms[0]);
+        mod.setDigestAlgorithm(digestAlgorithms[0]);
+
+        mod.process();
+        String signedContent = SamplerPayloadAccessor.getPayload(sampler);
+        assertThat(signedContent, containsString("<ds:Reference URI=\"#X509-"));
+        assertThat(signedContent, containsString("<wsse:BinarySecurityToken "));
     }
 }

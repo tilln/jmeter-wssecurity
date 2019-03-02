@@ -1,6 +1,5 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import java.util.Collections;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -12,7 +11,6 @@ import org.apache.log.Logger;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.callback.DOMCallbackLookup;
-import org.apache.wss4j.dom.message.WSSecBase;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
@@ -85,6 +83,7 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
                 List<Element> elements = super.getElements(localname, namespace);
                 if (elements.isEmpty()) {
                     if (WSConstants.BINARY_TOKEN_LN.equals(localname) && WSConstants.WSSE_NS.equals(namespace)) {
+                        log.debug("DOM lookup for Binary Security Token");
                         /* In case the element searched for is the wsse:BinarySecurityToken, return the element prepared by
                            wss4j. If we return the original DOM element, the digest calculation fails because the element
                            is not yet attached to the DOM tree, so instead return a copy which includes all namespaces */
@@ -92,7 +91,7 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
                             DOMResult result = new DOMResult();
                             TransformerFactory.newInstance().newTransformer()
                                 .transform(new DOMSource(secBuilder.getBinarySecurityTokenElement()), result);
-                            return Collections.singletonList(((Document) result.getNode()).getDocumentElement());
+                            elements.add(((Document)result.getNode()).getDocumentElement());
                         } catch (TransformerException e) {
                             log.error("Failed to clone Binary Security Token", e);
                         }
