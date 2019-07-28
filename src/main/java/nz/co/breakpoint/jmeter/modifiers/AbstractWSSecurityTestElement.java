@@ -17,7 +17,7 @@ public abstract class AbstractWSSecurityTestElement extends AbstractXMLTestEleme
     static { WSSConfig.init(); }
 
     private String actor;
-    protected List<Attachment> attachments = new ArrayList<Attachment>();
+    protected List<Attachment> attachments = new ArrayList<>();
     private AttachmentCallbackHandler attachmentCallbackHandler = null;
 
     public AbstractWSSecurityTestElement() throws ParserConfigurationException {

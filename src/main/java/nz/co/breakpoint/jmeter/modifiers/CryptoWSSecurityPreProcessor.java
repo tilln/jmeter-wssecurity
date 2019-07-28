@@ -1,35 +1,25 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecBase;
-
-import static org.apache.wss4j.common.crypto.Merlin.PREFIX;
-import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_FILE;
-import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_PASSWORD;
 
 /**
  * Abstract parent class of any preprocessors that perform crypto operations (e.g. signature or encryption).
  */
 public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPreProcessor {
 
-    private static final Logger log = LoggingManager.getLoggerForClass();
-
-    private final Properties cryptoProps = new Properties(); // Holds configured attributes for crypto instance
+    protected CryptoTestElement crypto = new CryptoTestElement();
 
     protected List<SecurityPart> partsToSecure; // Holds the names of XML elements to secure (e.g. SOAP Body)
-    protected String certAlias, certPassword, keyIdentifier;
+    protected String keyIdentifier;
 
-    static final Map<String, Integer> keyIdentifierMap = new HashMap<String, Integer>();
+    static final Map<String, Integer> keyIdentifierMap = new HashMap<>();
     static {
         keyIdentifierMap.put("Binary Security Token",         WSConstants.BST_DIRECT_REFERENCE);
         keyIdentifierMap.put("Issuer Name and Serial Number", WSConstants.ISSUER_SERIAL);
@@ -57,43 +47,25 @@ public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPre
     }
 
     protected Crypto getCrypto() throws WSSecurityException {
-        // A new crypto instance needs to be created for every iteration as the config could contain variables which may change.
-        log.debug("Getting crypto instance");
-        return CryptoFactory.getInstance(cryptoProps);
+        return crypto.getInstance();
     }
 
     // Accessors
-    public String getCertAlias() {
-        return certAlias;
-    }
+    public String getCertAlias() { return crypto.getCertAlias(); }
 
-    public void setCertAlias(String certAlias) {
-        this.certAlias = certAlias;
-    }
+    public void setCertAlias(String certAlias) { crypto.setCertAlias(certAlias); }
 
-    public String getCertPassword() {
-        return certPassword;
-    }
+    public String getCertPassword() { return crypto.getCertPassword(); }
 
-    public void setCertPassword(String certPassword) {
-        this.certPassword = certPassword;
-    }
+    public void setCertPassword(String certPassword) { crypto.setCertPassword(certPassword); }
 
-    public String getKeystoreFile() {
-        return cryptoProps.getProperty(PREFIX+KEYSTORE_FILE);
-    }
+    public String getKeystoreFile() { return crypto.getKeystoreFile(); }
 
-    public void setKeystoreFile(String keystoreFile) {
-        cryptoProps.setProperty(PREFIX+KEYSTORE_FILE, keystoreFile);
-    }
+    public void setKeystoreFile(String keystoreFile) { crypto.setKeystoreFile(keystoreFile); }
 
-    public String getKeystorePassword() {
-        return cryptoProps.getProperty(PREFIX+KEYSTORE_PASSWORD);
-    }
+    public String getKeystorePassword() { return crypto.getKeystorePassword(); }
 
-    public void setKeystorePassword(String keystorePassword) {
-        cryptoProps.setProperty(PREFIX+KEYSTORE_PASSWORD, keystorePassword);
-    }
+    public void setKeystorePassword(String keystorePassword) { crypto.setKeystorePassword(keystorePassword); }
 
     protected void setKeyIdentifier(WSSecBase secBuilder) {
         secBuilder.setKeyIdentifierType(keyIdentifierMap.get(keyIdentifier));
