@@ -1,7 +1,11 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
+import java.beans.PropertyDescriptor;
 import java.util.ResourceBundle;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
+import org.apache.jmeter.testbeans.gui.FileEditor;
+import org.apache.jmeter.testbeans.gui.PasswordEditor;
+
 import static org.apache.jmeter.util.JMeterUtils.getJMeterVersion;
 
 public class AbstractWSSecurityTestElementBeanInfo extends BeanInfoSupport {
@@ -20,5 +24,31 @@ public class AbstractWSSecurityTestElementBeanInfo extends BeanInfoSupport {
         return rb != null && rb.containsKey(resourceName) ? 
             rb.getString(resourceName).split("\\|") : 
             defaults;
+    }
+
+    protected void createCertificateProperties() {
+        createPropertyGroup("Certificate", new String[]{
+            "keystoreFile", "keystorePassword", "certAlias", "certPassword"
+        });
+        PropertyDescriptor p;
+
+        p = property("keystoreFile");
+        p.setPropertyEditorClass(FileEditor.class);
+        p.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        p.setValue(DEFAULT, "");
+
+        p = property("keystorePassword");
+        p.setPropertyEditorClass(PasswordEditor.class);
+        p.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        p.setValue(DEFAULT, "");
+
+        p = property("certAlias");
+        p.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        p.setValue(DEFAULT, "");
+
+        p = property("certPassword");
+        p.setPropertyEditorClass(PasswordEditor.class);
+        p.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        p.setValue(DEFAULT, "");
     }
 }

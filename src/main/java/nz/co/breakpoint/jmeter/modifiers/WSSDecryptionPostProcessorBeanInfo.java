@@ -8,6 +8,8 @@ public class WSSDecryptionPostProcessorBeanInfo extends CryptoWSSecurityPostProc
     public WSSDecryptionPostProcessorBeanInfo() {
         super(WSSDecryptionPostProcessor.class);
 
+        property("certAlias").setHidden(true); // not needed for decryption, key reference is in response
+
         createPropertyGroup("Decryption", new String[] { "attachments" });
 
         PropertyDescriptor p = property("attachments");

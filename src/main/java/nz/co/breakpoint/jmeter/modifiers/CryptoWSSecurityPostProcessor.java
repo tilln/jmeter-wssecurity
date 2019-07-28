@@ -1,60 +1,38 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
-import java.util.Properties;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
-import static org.apache.wss4j.common.crypto.Merlin.PREFIX;
-import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_FILE;
-import static org.apache.wss4j.common.crypto.Merlin.KEYSTORE_PASSWORD;
-
 /**
- * Abstract parent class of any preprocessors that perform crypto operations (e.g. signature or encryption).
+ * Abstract parent class of any postprocessors that perform crypto operations (e.g. signature or encryption).
  */
 public abstract class CryptoWSSecurityPostProcessor extends AbstractWSSecurityPostProcessor {
 
-    private static final Logger log = LoggingManager.getLoggerForClass();
-
-    private final Properties cryptoProps = new Properties(); // Holds configured attributes for crypto instance
-
-    private String certPassword;
+    protected CryptoTestElement crypto = new CryptoTestElement();
 
     public CryptoWSSecurityPostProcessor() throws ParserConfigurationException {
         super();
     }
 
     protected Crypto getCrypto() throws WSSecurityException {
-        // A new crypto instance needs to be created for every iteration as the config could contain variables which may change.
-        log.debug("Getting crypto instance");
-        return CryptoFactory.getInstance(cryptoProps);
+        return crypto.getInstance();
     }
 
     // Accessors
-    public String getCertPassword() {
-        return certPassword;
-    }
+    public String getCertAlias() { return crypto.getCertAlias(); }
 
-    public void setCertPassword(String certPassword) {
-        this.certPassword = certPassword;
-    }
+    public void setCertAlias(String certAlias) { crypto.setCertAlias(certAlias); }
 
-    public String getKeystoreFile() {
-        return cryptoProps.getProperty(PREFIX+KEYSTORE_FILE);
-    }
+    public String getCertPassword() { return crypto.getCertPassword(); }
 
-    public void setKeystoreFile(String keystoreFile) {
-        cryptoProps.setProperty(PREFIX+KEYSTORE_FILE, keystoreFile);
-    }
+    public void setCertPassword(String certPassword) { crypto.setCertPassword(certPassword); }
 
-    public String getKeystorePassword() {
-        return cryptoProps.getProperty(PREFIX+KEYSTORE_PASSWORD);
-    }
+    public String getKeystoreFile() { return crypto.getKeystoreFile(); }
 
-    public void setKeystorePassword(String keystorePassword) {
-        cryptoProps.setProperty(PREFIX+KEYSTORE_PASSWORD, keystorePassword);
-    }
+    public void setKeystoreFile(String keystoreFile) { crypto.setKeystoreFile(keystoreFile); }
+
+    public String getKeystorePassword() { return crypto.getKeystorePassword(); }
+
+    public void setKeystorePassword(String keystorePassword) { crypto.setKeystorePassword(keystorePassword); }
 }
