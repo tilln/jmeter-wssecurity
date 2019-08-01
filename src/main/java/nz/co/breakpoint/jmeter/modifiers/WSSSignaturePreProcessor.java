@@ -37,6 +37,7 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         getKeyIdentifierLabelForType(WSConstants.SKI_KEY_IDENTIFIER),
         getKeyIdentifierLabelForType(WSConstants.THUMBPRINT_IDENTIFIER),
         getKeyIdentifierLabelForType(WSConstants.KEY_VALUE),
+        getKeyIdentifierLabelForType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER),
     };
 
     static final String[] signatureCanonicalizations = new String[]{
@@ -50,6 +51,10 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA384,  XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA512,
         XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1,      XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256,
         XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384,    XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512,
+        // Symmetric algorithms require shared secret key:
+        XMLSignature.ALGO_ID_MAC_HMAC_SHA1,           XMLSignature.ALGO_ID_MAC_HMAC_SHA224,
+        XMLSignature.ALGO_ID_MAC_HMAC_SHA256,         XMLSignature.ALGO_ID_MAC_HMAC_SHA384,
+        XMLSignature.ALGO_ID_MAC_HMAC_SHA512,
     };
 
     static final String[] digestAlgorithms = new String[]{
@@ -59,6 +64,19 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
 
     public WSSSignaturePreProcessor() throws ParserConfigurationException {
         super();
+    }
+
+    static boolean isSymmetricKeyIdentifier(String ki) {
+        return ki != null && (
+            ki.equals(getKeyIdentifierLabelForType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER)) ||
+            ki.equals(getKeyIdentifierLabelForType(WSConstants.CUSTOM_KEY_IDENTIFIER)) ||
+            ki.equals(getKeyIdentifierLabelForType(WSConstants.CUSTOM_SYMM_SIGNING)) ||
+            ki.equals(getKeyIdentifierLabelForType(WSConstants.CUSTOM_SYMM_SIGNING_DIRECT))
+        );
+    }
+
+    static boolean isSymmetricSignatureAlgorithm(String signatureAlgorithm) {
+        return signatureAlgorithm.contains("#hmac-");
     }
 
     @Override
@@ -71,6 +89,9 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         setKeyIdentifier(secBuilder);
         setPartsToSecure(secBuilder);
         secBuilder.setSignatureAlgorithm(getSignatureAlgorithm());
+        if (isSymmetricSignatureAlgorithm(getSignatureAlgorithm())) {
+            secBuilder.setSecretKey(crypto.getSecretKey());
+        }
         secBuilder.setSigCanonicalization(getSignatureCanonicalization());
         secBuilder.setDigestAlgo(getDigestAlgorithm());
         secBuilder.setUseSingleCertificate(isUseSingleCertificate());
