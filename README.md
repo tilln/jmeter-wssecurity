@@ -88,6 +88,11 @@ Configuration
 
 The dropdown fields allow for the customization of most signature and encryption settings, depending on what the endpoint's WSDL defines.
 
+:warning: *Not all setting combinations are valid, and JMeter does not enforce a valid combination to be entered.
+Instead, invalid ones will cause errors to be logged during runtime.*
+
+*Example: Key Identifier Type "Encrypted Key SHA1" is only valid for symmetric Signature Algorithms (HMAC).*
+
 #### Parts to Sign/Parts to Encrypt
 
 These lists are empty by default, however, that results in the SOAP Body content to be signed or encrypted.
@@ -126,8 +131,18 @@ but only if it is an immediate child node of the SOAP Header.
 
 ### Post-Processor
 
+The SOAP Message Decrypter takes a sampler's response data as input, expecting a SOAP message with WS-Security header,
+and decrypts the payload based on the content of a given keystore. This requires the Private Key Password
+of the encryption certificate.
+
+Note that validation operations, such as signature validation, will also be performed in addition to decryption
+(due to the way the underlying wss4j library is implemented). 
+Any such validations will currently fail if key information are not present. For example, should the response message
+include a symmetric signature token, the SOAP Message Decrypter has no means of retrieving the secret key 
+required for validation and will fail with an exception.
+
 Any WS-Security related exception encountered by the SOAP Message Decrypter 
-while trying to decrypt a response message will cause the sampler to fail and will create an 
+while trying to decrypt or validate a response message will cause the sampler to fail and will create an 
 [assertion](http://jmeter.apache.org/usermanual/component_reference.html#assertions) result, 
 effectively behaving like an implicit assertion.
 

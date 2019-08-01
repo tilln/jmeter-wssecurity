@@ -24,12 +24,14 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
     }
 
     @Test
-    public void testAllSignatureCombinations() throws Exception {
+    public void testAllSignatureCombinations() {
         for (String ki : keyIdentifiers) {
             for (String sc : signatureCanonicalizations) {
                 for (String sa : signatureAlgorithms) {
                     for (String da : digestAlgorithms) {
                         for (boolean us : new boolean[]{true, false}) {
+                            if (WSSSignaturePreProcessor.isSymmetricKeyIdentifier(ki) !=
+                                    WSSSignaturePreProcessor.isSymmetricSignatureAlgorithm(sa)) continue;
                             initCertSettings(mod, sa);
                             mod.setKeyIdentifier(ki);
                             mod.setSignatureCanonicalization(sc);
@@ -51,7 +53,7 @@ public class TestWSSSignaturePreProcessor extends TestWSSSecurityPreProcessorBas
     }
 
     @Test
-    public void testSignedBinarySecurityToken() throws Exception {
+    public void testSignedBinarySecurityToken() {
         HTTPSamplerBase sampler = createHTTPSampler();
         SecurityPart bstPart = new SecurityPart();
         bstPart.setName(WSConstants.BINARY_TOKEN_LN);
