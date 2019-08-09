@@ -10,9 +10,23 @@ public class WSSDecryptionPostProcessorBeanInfo extends CryptoWSSecurityPostProc
 
         property("certAlias").setHidden(true); // not needed for decryption, key reference is in response
 
+        createPropertyGroup("Validation", new String[] { "failOnWSSException", "credentials" });
+
+        PropertyDescriptor p = property("failOnWSSException");
+        p.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        p.setValue(DEFAULT, Boolean.TRUE);
+        p.setValue(NOT_OTHER, Boolean.TRUE);
+
+        p = property("credentials");
+        p.setPropertyEditorClass(TableEditor.class);
+        p.setValue(TableEditor.CLASSNAME, Credential.class.getName());
+        p.setValue(TableEditor.HEADERS, getTableHeadersWithDefaults("credentials.tableHeaders",
+                new String[]{"Identifier", "Password"}));
+        p.setValue(TableEditor.OBJECT_PROPERTIES, new String[]{"name", "password"});
+
         createPropertyGroup("Decryption", new String[] { "attachments" });
 
-        PropertyDescriptor p = property("attachments");
+        p = property("attachments");
         p.setPropertyEditorClass(TableEditor.class);
         p.setValue(TableEditor.CLASSNAME, Attachment.class.getName());
         p.setValue(TableEditor.HEADERS, getTableHeadersWithDefaults("attachments.tableHeaders",

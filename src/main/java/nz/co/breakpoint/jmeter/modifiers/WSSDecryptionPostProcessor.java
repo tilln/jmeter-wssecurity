@@ -1,21 +1,25 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
-import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
+import static org.apache.wss4j.common.ext.WSPasswordCallback.*;
 
 public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
 
@@ -23,33 +27,89 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
+    protected List<Credential> credentials = new ArrayList<>();
+    protected boolean failOnWSSException = false;
+
     public WSSDecryptionPostProcessor() throws ParserConfigurationException {
         super();
+    }
+
+    protected String getPasswordForAlias(String alias) {
+        for (Credential cred : credentials) {
+            if (alias.equals(cred.getName())) {
+                return cred.getPassword();
+            }
+        }
+        return null;
     }
 
     @Override
     protected Document process(Document document) throws WSSecurityException {
         WSSecurityEngine secEngine = new WSSecurityEngine();
+        Crypto crypto = getCrypto();
 
         RequestData requestData = new RequestData();
-        requestData.setSigVerCrypto(getCrypto());
-        requestData.setDecCrypto(getCrypto());
+        requestData.setSigVerCrypto(crypto);
+        requestData.setDecCrypto(crypto);
         requestData.setActor(getActor());
         updateAttachmentCallbackHandler();
         requestData.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
         requestData.setExpandXopInclude(true);
         requestData.setAllowRSA15KeyTransportAlgorithm(true);
-        requestData.setCallbackHandler(new CallbackHandler() {
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                for (Callback callback : callbacks) {
-                    if (callback instanceof WSPasswordCallback) {
-                        ((WSPasswordCallback)callback).setPassword(getCertPassword());
+        requestData.setCallbackHandler(callbacks -> {
+            for (Callback callback : callbacks) {
+                if (callback instanceof WSPasswordCallback) {
+                    // https://ws.apache.org/wss4j/topics.html#wspasswordcallback_identifiers
+                    WSPasswordCallback pwcb = (WSPasswordCallback)callback;
+                    switch (pwcb.getUsage()) {
+                        case DECRYPT:
+                            log.debug("Providing callback with private key password for "+pwcb.getIdentifier());
+                            pwcb.setPassword(getCertPassword());
+                            break;
+                        case USERNAME_TOKEN:
+                            log.debug("Providing callback with password for username "+pwcb.getIdentifier());
+                            pwcb.setPassword(getPasswordForAlias(pwcb.getIdentifier()));
+                            break;
+                        case SIGNATURE:
+                            log.debug("Not providing callback with anything");
+                            break;
+                        case SECRET_KEY:
+                            log.debug("Providing callback with secret key for digest "+pwcb.getIdentifier());
+                            try {
+                                KeyStore keystore = ((Merlin) crypto).getKeyStore();
+                                Enumeration<String> aliases = keystore.aliases();
+                                // Iterate through all keystore entries to find a secret key
+                                // with matching digest and known password:
+                                for (String alias; aliases.hasMoreElements(); ) {
+                                    alias = aliases.nextElement();
+                                    String password = getPasswordForAlias(alias);
+                                    if (password == null ||
+                                        !keystore.entryInstanceOf(alias, KeyStore.SecretKeyEntry.class)) continue;
+                                    byte[] keyBytes = this.crypto.getSecretKey(alias, password);
+                                    if (pwcb.getIdentifier().equals(CryptoTestElement.getSecretKeyDigest(keyBytes))) {
+                                        pwcb.setKey(keyBytes);
+                                        break;
+                                    }
+                                }
+                            } catch (KeyStoreException e) {
+                                log.error("Failed to find secret key entry", e);
+                            }
+                            break;
+                        default:
+                            log.warn("Ignoring unsupported password callback usage "+pwcb.getUsage());
                     }
                 }
             }
         });
-        WSHandlerResult results = secEngine.processSecurityHeader(document, requestData);
-
+        try {
+            WSHandlerResult results = secEngine.processSecurityHeader(document, requestData);
+        } catch (WSSecurityException e) {
+            if (isFailOnWSSException()) {
+                throw e;
+            } else {
+                log.debug("Suppressing exception", e);
+            }
+        }
         return document;
     }
 
@@ -77,6 +137,22 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
     }
 
     // Accessors
+    public boolean isFailOnWSSException() {
+        return failOnWSSException;
+    }
+
+    public void setFailOnWSSException(boolean failOnWSSException) {
+        this.failOnWSSException = failOnWSSException;
+    }
+
+    public List<Credential> getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(List<Credential> credentials) {
+        this.credentials = credentials;
+    }
+
     public List<Attachment> getAttachments() {
         return attachments;
     }

@@ -7,12 +7,9 @@ import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 
-import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
@@ -33,6 +30,7 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
         mod.setKeystoreFile("src/test/resources/keystore.jks");
         mod.setKeystorePassword("changeit");
         mod.setCertPassword("changeit");
+        mod.setFailOnWSSException(true);
         result = new SampleResult();
         result.setSuccessful(true);
         context.setPreviousResult(result);
@@ -69,19 +67,25 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
             +"</SOAP-ENV:Envelope>",
             "UTF-8");
 
-        JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, "false");
-        mod.process();
-        assertTrue(result.isSuccessful());
-        assertEquals(0, result.getAssertionResults().length);
+        for (boolean global: new boolean[]{false, true}) {
+            for (boolean local: new boolean[]{false, true}) {
+                JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, String.valueOf(global));
+                mod.setFailOnWSSException(local);
+                mod.process();
 
-        JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, "true");
-        mod.process();
-        assertFalse(result.isSuccessful());
-        AssertionResult[] assertionResults = result.getAssertionResults();
-        assertEquals(1, assertionResults.length);
-        assertEquals("WSSecurityException", assertionResults[0].getName());
-        assertTrue(assertionResults[0].isError());
-        assertThat(assertionResults[0].getFailureMessage(), containsString("Any SIG_KEY_INFO MUST contain exactly one child element"));
+                if (global && local) {
+                    assertFalse(result.isSuccessful());
+                    AssertionResult[] assertionResults = result.getAssertionResults();
+                    assertEquals(1, assertionResults.length);
+                    assertEquals("WSSecurityException", assertionResults[0].getName());
+                    assertTrue(assertionResults[0].isError());
+                    assertThat(assertionResults[0].getFailureMessage(), containsString("Any SIG_KEY_INFO MUST contain exactly one child element"));
+                } else {
+                    assertTrue(result.isSuccessful());
+                    assertEquals(0, result.getAssertionResults().length);
+                }
+            }
+        }
     }
 
     @Test
@@ -160,6 +164,66 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
 
         String decrypted = result.getResponseDataAsString();
         assertThat(decrypted, containsString("YXR0YWNobWU="));
+        assertTrue(result.isSuccessful());
+        assertEquals(0, result.getSubResults().length);
+    }
+
+    @Test
+    public void testUsernameTokenValidation() {
+        result.setResponseData("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" >"
+            +   "<SOAP-ENV:Header>"
+            +       "<wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" >"
+            +           "<wsse:UsernameToken>"
+            +               "<wsse:Username>jmeter</wsse:Username>"
+            +               "<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">password</wsse:Password>"
+            +           "</wsse:UsernameToken>"
+            +       "</wsse:Security>"
+            +   "</SOAP-ENV:Header>"
+            +   "<SOAP-ENV:Body />"
+            +"</SOAP-ENV:Envelope>",
+    "UTF-8");
+
+        mod.process();
+        assertFalse(result.isSuccessful());
+        assertThat(result.getAssertionResults()[0].getFailureMessage(), containsString("The security token could not be authenticated or authorized"));
+
+        result.setSuccessful(true);
+        mod.setCredentials(Arrays.asList(new Credential("jmeter", "password")));
+        mod.process();
+
+        assertTrue(result.isSuccessful());
+        assertEquals(0, result.getSubResults().length);
+    }
+
+    @Test
+    public void testTimestampValidation() {
+        result.setResponseData("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" >"
+            +   "<SOAP-ENV:Header>"
+            +       "<wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" >"
+            +           "<wsu:Timestamp xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">"
+            +               "<wsu:Created>2019-08-01T00:00:00Z</wsu:Created>"
+            +               "<wsu:Expires>2019-08-01T00:00:00Z</wsu:Expires>"
+            +           "</wsu:Timestamp>"
+            +       "</wsse:Security>"
+            +   "</SOAP-ENV:Header>"
+            +   "<SOAP-ENV:Body />"
+            +"</SOAP-ENV:Envelope>",
+    "UTF-8");
+
+        mod.process();
+
+        assertFalse(result.isSuccessful());
+        assertThat(result.getAssertionResults()[0].getFailureMessage(), containsString("Invalid timestamp: The message timestamp has expired"));
+    }
+
+    @Test
+    public void testComplexHeader() throws Exception {
+        result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/complex-header.xml")));
+        mod.setCredentials(Arrays.asList(
+            new Credential("hmac", "changeit"),
+            new Credential("jmeter", "jmeter")
+        ));
+        mod.process();
         assertTrue(result.isSuccessful());
         assertEquals(0, result.getSubResults().length);
     }

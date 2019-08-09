@@ -90,7 +90,7 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         setPartsToSecure(secBuilder);
         secBuilder.setSignatureAlgorithm(getSignatureAlgorithm());
         if (isSymmetricSignatureAlgorithm(getSignatureAlgorithm())) {
-            secBuilder.setSecretKey(crypto.getSecretKey());
+            secBuilder.setSecretKey(crypto.getSecretKey(getCertAlias(), getCertPassword()));
         }
         secBuilder.setSigCanonicalization(getSignatureCanonicalization());
         secBuilder.setDigestAlgo(getDigestAlgorithm());

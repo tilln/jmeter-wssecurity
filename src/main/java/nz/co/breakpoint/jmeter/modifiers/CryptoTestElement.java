@@ -12,6 +12,9 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.xml.security.utils.XMLUtils;
+
 import static org.apache.wss4j.common.crypto.Merlin.*;
 
 /** Provides common keystore settings to Crypto Pre/Postprocessors.
@@ -32,21 +35,31 @@ public class CryptoTestElement extends AbstractTestElement {
         return CryptoFactory.getInstance(cryptoProps);
     }
 
-    /** Extract secret key with the current alias and password from the keystore.
+    /** Extract secret key with the given alias and password from the keystore.
      */
-    public byte[] getSecretKey() {
+    public byte[] getSecretKey(String alias, String password) {
         try {
             // Crypto interface has no method to get secret key or keystore, so cast to Merlin (which we created ourselves):
             SecretKey key = (SecretKey)((Merlin) getInstance()).getKeyStore()
-                    .getKey(getCertAlias(), getCertPassword().toCharArray());
+                    .getKey(alias, password.toCharArray());
             if (key == null) {
-                log.error("Key "+getCertAlias()+" not found in keystore");
+                log.error("Key "+alias+" not found in keystore");
                 return null;
             }
-            log.debug("Symmetric signature with secret key algorithm "+key.getAlgorithm()+" format "+key.getFormat());
+            log.debug("Found secret key "+alias+", algorithm "+key.getAlgorithm()+" format "+key.getFormat());
             return key.getEncoded();
         } catch (WSSecurityException | KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
             log.error("Error getting secret key: ", e);
+        }
+        return null;
+    }
+
+    public static String getSecretKeyDigest(byte[] keyBytes) {
+        try {
+            byte[] encodedBytes = KeyUtils.generateDigest(keyBytes);
+            return XMLUtils.encodeToString(encodedBytes);
+        } catch (WSSecurityException e) {
+            log.error("Failed to get secret key digest ", e);
         }
         return null;
     }

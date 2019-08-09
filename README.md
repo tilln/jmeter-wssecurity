@@ -135,18 +135,23 @@ The SOAP Message Decrypter takes a sampler's response data as input, expecting a
 and decrypts the payload based on the content of a given keystore. This requires the Private Key Password
 of the encryption certificate.
 
-Note that validation operations, such as signature validation, will also be performed in addition to decryption
-(due to the way the underlying wss4j library is implemented). 
-Any such validations will currently fail if key information are not present. For example, should the response message
-include a symmetric signature token, the SOAP Message Decrypter has no means of retrieving the secret key 
-required for validation and will fail with an exception.
+Note: Due to the way the underlying wss4j library is implemented, any other, not encryption related, security tokens 
+in the response message will also be processed, for example signature tokens. 
+Any such processing will fail if key information is not present. For example, should the response message
+include a symmetric signature token, the SOAP Message Decrypter needs the secret key that was used to generate the token.
+
+The key(s) may be provided in the configured keystore, and the secret key password(s) can be listed 
+in the table *Credentials for processing of WSS Header Tokens*.
+Likewise, if a response were to contain a Username Token, the password(s) for the expected username(s) can be listed in
+that table, so that the Post-Processor is able to validate the token.
 
 Any WS-Security related exception encountered by the SOAP Message Decrypter 
 while trying to decrypt or validate a response message will cause the sampler to fail and will create an 
 [assertion](http://jmeter.apache.org/usermanual/component_reference.html#assertions) result, 
 effectively behaving like an implicit assertion.
 
-If this behaviour is not desired, it may be turned off via setting the JMeter property `jmeter.wssecurity.failSamplerOnWSSException=false`.
+If this behaviour is not desired, it may be turned off for a SOAP Message Decrypter via setting 
+*Fail Sampler on WSS Exception* to "False", or globally via setting the JMeter property `jmeter.wssecurity.failSamplerOnWSSException=false`.
 
 ### Support for 3rd party samplers
 
