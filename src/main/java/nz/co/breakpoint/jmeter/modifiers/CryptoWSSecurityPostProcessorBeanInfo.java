@@ -5,6 +5,6 @@ public class CryptoWSSecurityPostProcessorBeanInfo extends AbstractWSSecurityPos
     public CryptoWSSecurityPostProcessorBeanInfo(Class<? extends CryptoWSSecurityPostProcessor> clazz) {
         super(clazz);
 
-        createCertificateProperties();
+        createCertificateProperties(false);
     }
 }

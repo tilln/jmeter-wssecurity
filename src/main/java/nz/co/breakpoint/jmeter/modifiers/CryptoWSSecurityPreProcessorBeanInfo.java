@@ -8,7 +8,7 @@ public class CryptoWSSecurityPreProcessorBeanInfo extends AbstractWSSecurityPreP
     public CryptoWSSecurityPreProcessorBeanInfo(Class<? extends CryptoWSSecurityPreProcessor> clazz) {
         super(clazz);
 
-        createCertificateProperties();
+        createCertificateProperties(true);
     }
 
     // This may be added to a property group by subclasses (if desired)

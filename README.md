@@ -132,16 +132,19 @@ but only if it is an immediate child node of the SOAP Header.
 ### Post-Processor
 
 The SOAP Message Decrypter takes a sampler's response data as input, expecting a SOAP message with WS-Security header,
-and decrypts the payload based on the content of a given keystore. This requires the Private Key Password
+and decrypts the payload based on the content of a given keystore. This requires the private key password
 of the encryption certificate.
 
-Note: Due to the way the underlying wss4j library is implemented, any other, not encryption related, security tokens 
+Until plugin version 1.6 this password is expected in the field "Private Key Password". As of version 1.7 it needs to be
+provided in the table *Credentials for WSS Processing*, along with the alias of the keystore entry.
+
+Note: Due to the way the underlying wss4j library is implemented, any other, not encryption related security tokens 
 in the response message will also be processed, for example signature tokens. 
 Any such processing will fail if key information is not present. For example, should the response message
 include a symmetric signature token, the SOAP Message Decrypter needs the secret key that was used to generate the token.
 
 The key(s) may be provided in the configured keystore, and the secret key password(s) can be listed 
-in the table *Credentials for processing of WSS Header Tokens*.
+in the table *Credentials for WSS Processing*.
 Likewise, if a response were to contain a Username Token, the password(s) for the expected username(s) can be listed in
 that table, so that the Post-Processor is able to validate the token.
 
@@ -150,8 +153,7 @@ while trying to decrypt or validate a response message will cause the sampler to
 [assertion](http://jmeter.apache.org/usermanual/component_reference.html#assertions) result, 
 effectively behaving like an implicit assertion.
 
-If this behaviour is not desired, it may be turned off for a SOAP Message Decrypter via setting 
-*Fail Sampler on WSS Exception* to "False", or globally via setting the JMeter property `jmeter.wssecurity.failSamplerOnWSSException=false`.
+If this behaviour is not desired, it may be turned off via setting the JMeter property `jmeter.wssecurity.failSamplerOnWSSException=false`.
 
 ### Support for 3rd party samplers
 

@@ -26,10 +26,10 @@ public class AbstractWSSecurityTestElementBeanInfo extends BeanInfoSupport {
             defaults;
     }
 
-    protected void createCertificateProperties() {
-        createPropertyGroup("Certificate", new String[]{
-            "keystoreFile", "keystorePassword", "certAlias", "certPassword"
-        });
+    protected void createCertificateProperties(boolean includeCertificateCredentials) {
+        createPropertyGroup("Certificate", includeCertificateCredentials ?
+            new String[]{ "keystoreFile", "keystorePassword", "certAlias", "certPassword"} :
+            new String[]{ "keystoreFile", "keystorePassword" });
         PropertyDescriptor p;
 
         p = property("keystoreFile");
@@ -42,13 +42,15 @@ public class AbstractWSSecurityTestElementBeanInfo extends BeanInfoSupport {
         p.setValue(NOT_UNDEFINED, Boolean.TRUE);
         p.setValue(DEFAULT, "");
 
-        p = property("certAlias");
-        p.setValue(NOT_UNDEFINED, Boolean.TRUE);
-        p.setValue(DEFAULT, "");
+        if (includeCertificateCredentials) {
+            p = property("certAlias");
+            p.setValue(NOT_UNDEFINED, Boolean.TRUE);
+            p.setValue(DEFAULT, "");
 
-        p = property("certPassword");
-        p.setPropertyEditorClass(PasswordEditor.class);
-        p.setValue(NOT_UNDEFINED, Boolean.TRUE);
-        p.setValue(DEFAULT, "");
+            p = property("certPassword");
+            p.setPropertyEditorClass(PasswordEditor.class);
+            p.setValue(NOT_UNDEFINED, Boolean.TRUE);
+            p.setValue(DEFAULT, "");
+        }
     }
 }
