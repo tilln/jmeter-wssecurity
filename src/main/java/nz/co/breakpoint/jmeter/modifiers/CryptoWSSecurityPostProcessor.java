@@ -20,14 +20,6 @@ public abstract class CryptoWSSecurityPostProcessor extends AbstractWSSecurityPo
     }
 
     // Accessors
-    public String getCertAlias() { return crypto.getCertAlias(); }
-
-    public void setCertAlias(String certAlias) { crypto.setCertAlias(certAlias); }
-
-    public String getCertPassword() { return crypto.getCertPassword(); }
-
-    public void setCertPassword(String certPassword) { crypto.setCertPassword(certPassword); }
-
     public String getKeystoreFile() { return crypto.getKeystoreFile(); }
 
     public void setKeystoreFile(String keystoreFile) { crypto.setKeystoreFile(keystoreFile); }

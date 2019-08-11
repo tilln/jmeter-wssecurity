@@ -24,7 +24,6 @@ public class CryptoTestElement extends AbstractTestElement {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     private final Properties cryptoProps = new Properties(); // Holds configured attributes for crypto instance
-    protected String certAlias, certPassword;
 
     public CryptoTestElement() {
         cryptoProps.setProperty(PREFIX+KEYSTORE_TYPE, "JCEKS"); // compatible with JKS and PKCS12/PFX
@@ -63,14 +62,6 @@ public class CryptoTestElement extends AbstractTestElement {
         }
         return null;
     }
-
-    public String getCertAlias() { return certAlias; }
-
-    public void setCertAlias(String certAlias) { this.certAlias = certAlias; }
-
-    public String getCertPassword() { return certPassword; }
-
-    public void setCertPassword(String certPassword) { this.certPassword = certPassword; }
 
     public String getKeystoreFile() { return cryptoProps.getProperty(PREFIX+KEYSTORE_FILE); }
 
