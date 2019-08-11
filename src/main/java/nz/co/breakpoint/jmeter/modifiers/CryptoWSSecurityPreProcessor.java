@@ -15,6 +15,7 @@ import org.apache.wss4j.dom.message.WSSecBase;
 public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPreProcessor {
 
     protected CryptoTestElement crypto = new CryptoTestElement();
+    protected String certAlias, certPassword; // Keystore alias to use for this preprocessor's crypto operation
 
     protected List<SecurityPart> partsToSecure; // Holds the names of XML elements to secure (e.g. SOAP Body)
     protected String keyIdentifier;
@@ -51,13 +52,13 @@ public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPre
     }
 
     // Accessors
-    public String getCertAlias() { return crypto.getCertAlias(); }
+    public String getCertAlias() { return certAlias; }
 
-    public void setCertAlias(String certAlias) { crypto.setCertAlias(certAlias); }
+    public void setCertAlias(String certAlias) { this.certAlias = certAlias; }
 
-    public String getCertPassword() { return crypto.getCertPassword(); }
+    public String getCertPassword() { return certPassword; }
 
-    public void setCertPassword(String certPassword) { crypto.setCertPassword(certPassword); }
+    public void setCertPassword(String certPassword) { this.certPassword = certPassword; }
 
     public String getKeystoreFile() { return crypto.getKeystoreFile(); }
 

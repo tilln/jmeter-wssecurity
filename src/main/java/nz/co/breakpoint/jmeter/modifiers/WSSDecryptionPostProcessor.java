@@ -28,7 +28,6 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
     private static final Logger log = LoggingManager.getLoggerForClass();
 
     protected List<Credential> credentials = new ArrayList<>();
-    protected boolean failOnWSSException = false;
 
     public WSSDecryptionPostProcessor() throws ParserConfigurationException {
         super();
@@ -64,7 +63,7 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
                     switch (pwcb.getUsage()) {
                         case DECRYPT:
                             log.debug("Providing callback with private key password for "+pwcb.getIdentifier());
-                            pwcb.setPassword(getCertPassword());
+                            pwcb.setPassword(getPasswordForAlias(pwcb.getIdentifier()));
                             break;
                         case USERNAME_TOKEN:
                             log.debug("Providing callback with password for username "+pwcb.getIdentifier());
@@ -82,10 +81,8 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
                                 // with matching digest and known password:
                                 for (String alias; aliases.hasMoreElements(); ) {
                                     alias = aliases.nextElement();
-                                    String password = getPasswordForAlias(alias);
-                                    if (password == null ||
-                                        !keystore.entryInstanceOf(alias, KeyStore.SecretKeyEntry.class)) continue;
-                                    byte[] keyBytes = this.crypto.getSecretKey(alias, password);
+                                    if (!keystore.entryInstanceOf(alias, KeyStore.SecretKeyEntry.class)) continue;
+                                    byte[] keyBytes = this.crypto.getSecretKey(alias, getPasswordForAlias(alias));
                                     if (pwcb.getIdentifier().equals(CryptoTestElement.getSecretKeyDigest(keyBytes))) {
                                         pwcb.setKey(keyBytes);
                                         break;
@@ -101,15 +98,7 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
                 }
             }
         });
-        try {
-            WSHandlerResult results = secEngine.processSecurityHeader(document, requestData);
-        } catch (WSSecurityException e) {
-            if (isFailOnWSSException()) {
-                throw e;
-            } else {
-                log.debug("Suppressing exception", e);
-            }
-        }
+        WSHandlerResult results = secEngine.processSecurityHeader(document, requestData);
         return document;
     }
 
@@ -137,27 +126,11 @@ public class WSSDecryptionPostProcessor extends CryptoWSSecurityPostProcessor {
     }
 
     // Accessors
-    public boolean isFailOnWSSException() {
-        return failOnWSSException;
-    }
+    public List<Credential> getCredentials() { return credentials; }
 
-    public void setFailOnWSSException(boolean failOnWSSException) {
-        this.failOnWSSException = failOnWSSException;
-    }
+    public void setCredentials(List<Credential> credentials) { this.credentials = credentials; }
 
-    public List<Credential> getCredentials() {
-        return credentials;
-    }
+    public List<Attachment> getAttachments() { return attachments; }
 
-    public void setCredentials(List<Credential> credentials) {
-        this.credentials = credentials;
-    }
-
-    public List<Attachment> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<Attachment> attachments) {
-        this.attachments = attachments;
-    }
+    public void setAttachments(List<Attachment> attachments) { this.attachments = attachments; }
 }

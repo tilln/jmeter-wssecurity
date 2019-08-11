@@ -29,8 +29,7 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
         mod.setThreadContext(context);
         mod.setKeystoreFile("src/test/resources/keystore.jks");
         mod.setKeystorePassword("changeit");
-        mod.setCertPassword("changeit");
-        mod.setFailOnWSSException(true);
+        mod.setCredentials(Arrays.asList(new Credential("rsa", "changeit")));
         result = new SampleResult();
         result.setSuccessful(true);
         context.setPreviousResult(result);
@@ -67,25 +66,19 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
             +"</SOAP-ENV:Envelope>",
             "UTF-8");
 
-        for (boolean global: new boolean[]{false, true}) {
-            for (boolean local: new boolean[]{false, true}) {
-                JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, String.valueOf(global));
-                mod.setFailOnWSSException(local);
-                mod.process();
+        JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, "false");
+        mod.process();
+        assertTrue(result.isSuccessful());
+        assertEquals(0, result.getAssertionResults().length);
 
-                if (global && local) {
-                    assertFalse(result.isSuccessful());
-                    AssertionResult[] assertionResults = result.getAssertionResults();
-                    assertEquals(1, assertionResults.length);
-                    assertEquals("WSSecurityException", assertionResults[0].getName());
-                    assertTrue(assertionResults[0].isError());
-                    assertThat(assertionResults[0].getFailureMessage(), containsString("Any SIG_KEY_INFO MUST contain exactly one child element"));
-                } else {
-                    assertTrue(result.isSuccessful());
-                    assertEquals(0, result.getAssertionResults().length);
-                }
-            }
-        }
+        JMeterUtils.setProperty(AbstractWSSecurityPostProcessor.FAIL_ON_WSS_EXCEPTION, "true");
+        mod.process();
+        assertFalse(result.isSuccessful());
+        AssertionResult[] assertionResults = result.getAssertionResults();
+        assertEquals(1, assertionResults.length);
+        assertEquals("WSSecurityException", assertionResults[0].getName());
+        assertTrue(assertionResults[0].isError());
+        assertThat(assertionResults[0].getFailureMessage(), containsString("Any SIG_KEY_INFO MUST contain exactly one child element"));
     }
 
     @Test
@@ -220,6 +213,7 @@ public class TestWSSDecryptionPostProcessor extends TestWSSSecurityPreProcessorB
     public void testComplexHeader() throws Exception {
         result.setResponseData(Files.readAllBytes(Paths.get("src/test/resources/complex-header.xml")));
         mod.setCredentials(Arrays.asList(
+            new Credential("rsa", "changeit"),
             new Credential("hmac", "changeit"),
             new Credential("jmeter", "jmeter")
         ));
