@@ -4,8 +4,15 @@
     <groupId>nz.co.breakpoint</groupId>
     <artifactId>jmeter-wssecurity</artifactId>
     <packaging>jar</packaging>
-    <version>1.7-SNAPSHOT</version>
-    <name>jmeter-wssecurity</name>
+    <version>1.7</version>
+    <name>${project.artifactId}</name>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,9 +22,8 @@
 
     <scm>
         <url>https://github.com/tilln/jmeter-wssecurity</url>
-        <connection>scm:git:git://github.com/tilln/jmeter-wssecurity</connection>
+        <connection>scm:git:git://github.com/tilln/jmeter-wssecurity.git</connection>
         <developerConnection>scm:git:git@github.com:tilln/jmeter-wssecurity.git</developerConnection>
-        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
@@ -69,23 +75,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
-                <configuration>
-                    <preparationGoals>clean install</preparationGoals>
-                    <tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
-                <configuration>
-                    <finalName>${project.name}-${project.version}</finalName>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

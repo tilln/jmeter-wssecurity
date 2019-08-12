@@ -1,6 +1,4 @@
 language: java
-before_install:
-- rm -rf target
 deploy:
   provider: releases
   api_key:
