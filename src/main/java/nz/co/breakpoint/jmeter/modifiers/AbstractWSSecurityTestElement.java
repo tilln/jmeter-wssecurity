@@ -45,9 +45,11 @@ public abstract class AbstractWSSecurityTestElement extends AbstractXMLTestEleme
         if (attachmentCallbackHandler == null) {
             attachmentCallbackHandler = new AttachmentCallbackHandler();
         }
-        for (Attachment a : attachments) {
-            // Multiple calls won't cause duplicates assuming that an attachment's cid won't change (so the same attachment would be overwritten):
-            attachmentCallbackHandler.addAttachment(a.toWss4jAttachment());
+        if (attachments != null) {
+            for (Attachment a : attachments) {
+                // Multiple calls won't cause duplicates assuming that an attachment's cid won't change (so the same attachment would be overwritten):
+                attachmentCallbackHandler.addAttachment(a.toWss4jAttachment());
+            }
         }
     }
 
