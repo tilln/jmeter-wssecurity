@@ -33,6 +33,7 @@ public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
     };
 
     static final String[] keyEncryptionAlgorithms = new String[]{
+        WSConstants.KEYTRANSPORT_RSAOAEP,
         WSConstants.KEYTRANSPORT_RSAOAEP_XENC11,
         WSConstants.KEYTRANSPORT_RSA15,
     };
