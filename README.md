@@ -84,6 +84,15 @@ Users familiar with SoapUI will find similarities to the [outgoing WS-Security c
 Configuration
 -------------
 
+### Keystore Settings
+
+The keystore file is expected to contain all keys referenced in the SOAP message headers
+that are required for signing and/or encrypting/decrypting.
+
+The default keystore type is JCEKS (since v1.7, before Java platform default). 
+Other keystore types can be used by defining the JMeter property `jmeter.wssecurity.keystoreType` (since v1.8),
+e.g. PKCS12, JKS, JCEKS.
+
 ### Pre-Processors
 
 The dropdown fields allow for the customization of most signature and encryption settings, depending on what the endpoint's WSDL defines.

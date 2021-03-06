@@ -6,6 +6,7 @@ import java.security.UnrecoverableKeyException;
 import java.util.Properties;
 import javax.crypto.SecretKey;
 import org.apache.jmeter.testelement.AbstractTestElement;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -23,10 +24,12 @@ public class CryptoTestElement extends AbstractTestElement {
 
     private static final Logger log = LoggingManager.getLoggerForClass();
 
+    static final String KEYSTORE_TYPE_PROPERTY = "jmeter.wssecurity.keystoreType";
+
     private final Properties cryptoProps = new Properties(); // Holds configured attributes for crypto instance
 
     public CryptoTestElement() {
-        cryptoProps.setProperty(PREFIX+KEYSTORE_TYPE, "JCEKS"); // compatible with JKS and PKCS12/PFX
+        cryptoProps.setProperty(PREFIX+KEYSTORE_TYPE, JMeterUtils.getPropDefault(KEYSTORE_TYPE_PROPERTY, "JCEKS"));
     }
 
     public Crypto getInstance() throws WSSecurityException {
