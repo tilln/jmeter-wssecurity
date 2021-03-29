@@ -53,17 +53,10 @@ public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
         log.debug("Initializing WSSecEncrypt");
         WSSecEncrypt secBuilder = new WSSecEncrypt(secHeader);
-        secBuilder.setExpandXopInclude(true); // don't encrypt just the xop reference but inline the attachment content first
-
-        secBuilder.setUserInfo(getCertAlias(), getCertPassword());
-        setKeyIdentifier(secBuilder);
-        setPartsToSecure(secBuilder);
+        prepareBuilder(secBuilder);
         secBuilder.setSymmetricEncAlgorithm(getSymmetricEncryptionAlgorithm());
         secBuilder.setKeyEncAlgo(getKeyEncryptionAlgorithm());
         secBuilder.setEncryptSymmKey(isCreateEncryptedKey());
-        updateAttachmentCallbackHandler();
-        secBuilder.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
-
         log.debug("Building WSSecEncrypt");
         return secBuilder.build(getCrypto());
     }

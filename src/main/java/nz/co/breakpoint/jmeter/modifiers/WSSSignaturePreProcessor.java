@@ -83,11 +83,8 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
     protected Document build(Document document, WSSecHeader secHeader) throws WSSecurityException {
         log.debug("Initializing WSSecSignature");
         WSSecSignature secBuilder = new WSSecSignature(secHeader);
-        secBuilder.setExpandXopInclude(true); // don't sign just the xop reference but inline the attachment content first
+        prepareBuilder(secBuilder);
 
-        secBuilder.setUserInfo(getCertAlias(), getCertPassword());
-        setKeyIdentifier(secBuilder);
-        setPartsToSecure(secBuilder);
         secBuilder.setSignatureAlgorithm(getSignatureAlgorithm());
         if (isSymmetricSignatureAlgorithm(getSignatureAlgorithm())) {
             secBuilder.setSecretKey(crypto.getSecretKey(getCertAlias(), getCertPassword()));
@@ -95,8 +92,6 @@ public class WSSSignaturePreProcessor extends CryptoWSSecurityPreProcessor {
         secBuilder.setSigCanonicalization(getSignatureCanonicalization());
         secBuilder.setDigestAlgo(getDigestAlgorithm());
         secBuilder.setUseSingleCertificate(isUseSingleCertificate());
-        updateAttachmentCallbackHandler();
-        secBuilder.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
 
         secBuilder.setCallbackLookup(new DOMCallbackLookup(document) {
             // Inspired by https://github.com/SmartBear/soapui/pull/34

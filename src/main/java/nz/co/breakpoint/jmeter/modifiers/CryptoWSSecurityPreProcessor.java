@@ -51,6 +51,19 @@ public abstract class CryptoWSSecurityPreProcessor extends AbstractWSSecurityPre
         return crypto.getInstance();
     }
 
+    /* This assigns common parameters to the WSS builder, such as
+     * credentials, parts etc.
+     */
+    protected WSSecBase prepareBuilder(WSSecBase secBuilder) {
+        secBuilder.setExpandXopInclude(true); // don't sign just the xop reference but inline the attachment content first
+        secBuilder.setUserInfo(getCertAlias(), getCertPassword());
+        setKeyIdentifier(secBuilder);
+        setPartsToSecure(secBuilder);
+        updateAttachmentCallbackHandler();
+        secBuilder.setAttachmentCallbackHandler(getAttachmentCallbackHandler());
+        return secBuilder;
+    }
+
     // Accessors
     public String getCertAlias() { return certAlias; }
 
