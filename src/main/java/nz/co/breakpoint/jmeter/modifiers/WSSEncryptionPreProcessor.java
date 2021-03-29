@@ -1,12 +1,13 @@
 package nz.co.breakpoint.jmeter.modifiers;
 
 import java.util.List;
+import javax.crypto.SecretKey;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.WSSecBase;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.w3c.dom.Document;
@@ -57,8 +58,10 @@ public class WSSEncryptionPreProcessor extends CryptoWSSecurityPreProcessor {
         secBuilder.setSymmetricEncAlgorithm(getSymmetricEncryptionAlgorithm());
         secBuilder.setKeyEncAlgo(getKeyEncryptionAlgorithm());
         secBuilder.setEncryptSymmKey(isCreateEncryptedKey());
+        log.debug("Generating symmetric key");
+        SecretKey symmetricKey = KeyUtils.getKeyGenerator(getSymmetricEncryptionAlgorithm()).generateKey();
         log.debug("Building WSSecEncrypt");
-        return secBuilder.build(getCrypto());
+        return secBuilder.build(getCrypto(), symmetricKey);
     }
 
     // Accessors
