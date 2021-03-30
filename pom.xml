@@ -4,7 +4,7 @@
     <groupId>nz.co.breakpoint</groupId>
     <artifactId>jmeter-wssecurity</artifactId>
     <packaging>jar</packaging>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8</version>
     <name>${project.artifactId}</name>
     <description>Apache JMeter plugin for signing, encrypting and decrypting SOAP messages (WS-Security)</description>
     <url>https://github.com/tilln/jmeter-wssecurity</url>
