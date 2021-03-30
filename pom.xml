@@ -4,7 +4,7 @@
     <groupId>nz.co.breakpoint</groupId>
     <artifactId>jmeter-wssecurity</artifactId>
     <packaging>jar</packaging>
-    <version>1.8</version>
+    <version>1.9-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <description>Apache JMeter plugin for signing, encrypting and decrypting SOAP messages (WS-Security)</description>
     <url>https://github.com/tilln/jmeter-wssecurity</url>
@@ -150,7 +150,7 @@
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
                 </plugins>
