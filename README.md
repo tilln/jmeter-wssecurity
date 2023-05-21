@@ -1,5 +1,4 @@
-# jmeter-wssecurity [![github-actions](https://github.com/tilln/jmeter-wssecurity/actions/workflows/release.yml/badge.svg)]
-(https://github.com/tilln/jmeter-wssecurity/actions/workflows/release.yml)
+# jmeter-wssecurity [![github-actions](https://github.com/tilln/jmeter-wssecurity/actions/workflows/release.yml/badge.svg)](https://github.com/tilln/jmeter-wssecurity/actions/workflows/release.yml)
 
 Overview
 ------------
