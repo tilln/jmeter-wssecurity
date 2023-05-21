@@ -1,7 +1,4 @@
-# jmeter-wssecurity [![travis][travis-image]][travis-url]
-
-[travis-image]: https://travis-ci.org/tilln/jmeter-wssecurity.svg?branch=master
-[travis-url]: https://travis-ci.org/tilln/jmeter-wssecurity
+# jmeter-wssecurity [![github-actions](https://github.com/tilln/jmeter-wssecurity/actions/workflows/release.yml/badge.svg)](https://github.com/tilln/jmeter-wssecurity/actions/workflows/release.yml)
 
 Overview
 ------------
@@ -30,16 +27,16 @@ Under tab "Available Plugins", select "WS Security for SOAP", then click "Apply 
 ### Via Package from [JMeter-Plugins.org](https://jmeter-plugins.org/)
 
 1. Remove wss4j-\*.jar and xmlsec-\*.jar from JMeter's lib directory (if applicable).
-2. Download and extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.8.zip) into JMeter's lib directory.
+2. Download and extract the [zip package](https://jmeter-plugins.org/files/packages/tilln-wssecurity-1.9.zip) into JMeter's lib directory.
 3. Restart JMeter.
 
 ### Via Manual Download
 
-1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.8/jmeter-wssecurity-1.8.jar) into JMeter's lib/ext directory.
+1. Copy the [jmeter-wssecurity jar file](https://github.com/tilln/jmeter-wssecurity/releases/download/1.9/jmeter-wssecurity-1.9.jar) into JMeter's lib/ext directory.
 2. Copy the following dependencies into JMeter's lib directory:
-	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/2.3.1/wss4j-ws-security-dom-2.3.1.jar)
-	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/2.3.1/wss4j-ws-security-common-2.3.1.jar)
-	* [org.apache.santuario / xmlsec](https://search.maven.org/remotecontent?filepath=org/apache/santuario/xmlsec/2.2.1/xmlsec-2.2.1.jar)
+	* [org.apache.wss4j / wss4j-ws-security-dom](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-dom/3.0.0/wss4j-ws-security-dom-3.0.0.jar)
+	* [org.apache.wss4j / wss4j-ws-security-common](https://search.maven.org/remotecontent?filepath=org/apache/wss4j/wss4j-ws-security-common/3.0.0/wss4j-ws-security-common-3.0.0.jar)
+	* [org.apache.santuario / xmlsec](https://search.maven.org/remotecontent?filepath=org/apache/santuario/xmlsec/3.0.1/xmlsec-3.0.1.jar)
 3. Make sure to remove older versions of the above dependencies from the JMeter lib directory.
 4. Restart JMeter.
 
